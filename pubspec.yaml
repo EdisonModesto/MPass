@@ -61,6 +61,7 @@ flutter:
   assets:
     - assets/images/copyicon.png
     - assets/images/fbIcon.png
+    - assets/images/settingsIcon.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

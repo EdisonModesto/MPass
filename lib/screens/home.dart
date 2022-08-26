@@ -1,5 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mpass/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+
 
 class Home extends StatefulWidget{
   @override
@@ -8,12 +12,59 @@ class Home extends StatefulWidget{
 
 class _homePage extends State<Home>{
 
-  void _func(bool t){
+  //categories Button and states
+  List<String> _category = ["All", "Most Used", "Social", "Work"];
+  List _catSelected = [false, false, false, false];
 
+  //passwords
+  List<String>? _Titles = [];
+  List<String>? _Emails = [];
+  List<String>? _Passwords = [];
+
+  int totalPass = 0;
+
+
+    _getPasswords() async {
+      final IconPref = await SharedPreferences.getInstance();
+      final TitlePref = await SharedPreferences.getInstance();
+      final EmailPref = await SharedPreferences.getInstance();
+      final PasswordPref = await SharedPreferences.getInstance();
+
+      setState(() {
+        _Titles = TitlePref.getStringList('Titles')!;
+        _Emails = EmailPref.getStringList('Emails')!;
+        _Passwords = PasswordPref.getStringList('Passwords')!;
+      });
+    }
+
+
+  _savePasswords(String tempTitle, String tempEmail, String tempPass) async{
+
+    final IconPref = await SharedPreferences.getInstance();
+    final TitlePref = await SharedPreferences.getInstance();
+    final EmailPref = await SharedPreferences.getInstance();
+    final PasswordPref = await SharedPreferences.getInstance();
+
+    setState((){
+      _Titles?.add(tempTitle);
+      _Emails?.add(tempEmail);
+      _Passwords?.add(tempPass);
+      totalPass += 1;
+    });
+
+    await TitlePref.setStringList('Titles', _Titles!);
+    await EmailPref.setStringList('Emails', _Emails!);
+    await PasswordPref.setStringList('Passwords', _Passwords!);
   }
+
+
+
 
   @override
   Widget build(BuildContext context){
+
+      _getPasswords();
+      totalPass = _Titles!.length;
     return SafeArea(
       child: Stack(
         children: [
@@ -75,13 +126,13 @@ class _homePage extends State<Home>{
                     children: [
                       //Text Label and Categories
                       Expanded(
-                          flex: 15,
+                          flex: 18,
                           child: Column(
                             children: [
                               //Text Lbl
                               Container(
                                 width: MediaQuery.of(context).size.width * 1,
-                                margin: EdgeInsets.only(bottom: 5),
+                                margin: EdgeInsets.only(bottom: 10),
                                 child: const Text(
                                   "Password Vault",
                                   textAlign: TextAlign.left,
@@ -93,66 +144,48 @@ class _homePage extends State<Home>{
                               ),
                               //Button Row
                               Expanded(
-                                  flex: 1,
+                                  flex: 50,
                                   child: Container(
                                     width: MediaQuery.of(context).size.width * 1,
-                                    height: 50,
-                                    child: ListView(
-                                      shrinkWrap: true,
+                                    height: 60,
+                                    child: ListView.builder(
+                                      itemCount: _category.length,
                                       scrollDirection: Axis.horizontal,
-
-                                      children: [
-                                        Container(
+                                      itemBuilder: (BuildContext context, int index){
+                                        return Container(
                                           margin: EdgeInsets.only(right: 10),
                                           child: OutlinedButton(
-                                            onPressed: null,
-                                            child: Text("All"),
+                                            onPressed: () => {
+                                              setState((){
+                                                _catSelected[index] = true;
+                                                for(int i = 0; i < _category.length; i++){
+                                                  if(i != index){
+                                                    _catSelected[i] = false;
+                                                  }
+                                                }
+                                              })
+                                            },
                                             style: OutlinedButton.styleFrom(
-                                                side: BorderSide(color: Color(0xff8269B8), width: 1),
+                                                side: BorderSide(
+                                                    color: _catSelected[index] ? Color(0xffA491CD) : Color(0xff8269B8), width: 1
+                                                ),
+
+                                                backgroundColor: _catSelected[index] ? Color(0xffA491CD) : Color(0xffFFF9F9),
                                                 minimumSize: Size(20, 0.5)
 
                                             ),
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(right: 10),
-                                          child: OutlinedButton(
-                                            onPressed: null,
-                                            child: Text("Most Used"),
-                                            style: OutlinedButton.styleFrom(
-                                                side: BorderSide(color: Color(0xff8269B8), width: 1),
-                                                minimumSize: Size(20, 0.5)
-
+                                            child: Text(
+                                              _category[index],
+                                              style: TextStyle(
+                                                color: _catSelected[index] ? Color(0xffFFF9F9) : Color(0xff000000),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(right: 10),
-                                          child: OutlinedButton(
-                                            onPressed: null,
-                                            child: Text("Social"),
-                                            style: OutlinedButton.styleFrom(
-                                                side: BorderSide(color: Color(0xff8269B8), width: 1),
-                                                minimumSize: Size(20, 0.5)
+                                        );
+                                      },
+                                      shrinkWrap: true,
+                                      padding: EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 5),
 
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(right: 10),
-                                          child: OutlinedButton(
-                                            onPressed: null,
-                                            child: Text("Work"),
-                                            style: OutlinedButton.styleFrom(
-                                                side: BorderSide(color: Color(0xff8269B8), width: 1),
-                                                minimumSize: Size(20, 0.5)
-
-                                            ),
-                                          ),
-                                        ),
-
-
-                                      ],
                                     ) ,
                                   )
 
@@ -167,37 +200,43 @@ class _homePage extends State<Home>{
                           child: Container(
                             margin: EdgeInsets.only(top: 10, bottom: 10),
                             child: ListView.builder(
-                              itemCount: 6,
+                              itemCount: _Titles?.length ?? 0,
                               itemBuilder: (BuildContext context, int index){
                                 return Container(
                                   width: MediaQuery.of(context).size.width * 1,
-                                  margin: const EdgeInsets.only(bottom: 10),
+                                  margin: const EdgeInsets.only(bottom: 20),
                                   height: 50,
                                   child: ListTile(
                                     contentPadding: const EdgeInsets.all(0),
                                     leading: Container(
-                                      padding: EdgeInsets.all(5),
+                                      padding: const EdgeInsets.only(top: 5, bottom: 5),
                                       child: Image.asset("assets/images/fbIcon.png"),
                                     ),
 
                                     trailing: IconButton(
                                         onPressed: null,
-                                        icon: Image.asset("assets/images/copyicon.png")
+                                        icon: Image.asset("assets/images/copyicon.png"),
+                                      padding: const EdgeInsets.only(top: 10, bottom: 10),
                                     ),
-                                    title: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      children: const [
-                                        Text(
-                                          "Facebook",
-                                          style: TextStyle(fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(
-                                          "sample@mail.com",
-                                          style: TextStyle(fontSize: 14),
-                                        )
-                                      ],
-                                    ),
+                                    title: Container(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Text(
+
+                                            _Titles![index],
+                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                          ),
+                                          AutoSizeText(
+                                            _Emails![index],
+                                            style: TextStyle(fontSize: 14),
+                                            maxLines: 1,
+                                          )
+                                        ],
+                                      ),
+                                    )
                                   ),
                                 );
                               },
@@ -218,7 +257,71 @@ class _homePage extends State<Home>{
                             color: Color(0xffA491CD),
                             width: MediaQuery.of(context).size.width * 1,
                             child: ElevatedButton(
-                              onPressed: null,
+                              onPressed: () async{
+
+                                String tempName = "";
+                                String tempMail = "";
+                                String tempPass = "";
+                                //final TextEditingController _controller = TextEditingController();
+                                showDialog(context: context, builder: (_) =>
+                                  AlertDialog(
+                                    title: const Text(
+                                      "Add Account",
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+
+                                    actions: [
+                                      TextButton(
+                                          onPressed: (){
+                                            Navigator.pop(context, true);
+                                          },
+                                          child: const Text("Close"),
+                                      ),
+                                      TextButton(
+                                          onPressed: (){
+                                              _savePasswords(tempName, tempMail, tempPass);
+                                            Navigator.pop(context, true);
+                                          },
+
+                                          child: const Text("Add")
+                                      ),
+                                    ],
+
+                                    content: Container(
+                                      width: MediaQuery.of(context).size.width * 1,
+                                      height: MediaQuery.of(context).size.height * 0.25,
+                                      child: Column(
+                                        children: [
+                                          TextField(
+                                            decoration: const InputDecoration(hintText: "App Name"),
+                                            onChanged: (val) {
+                                              setState((){
+                                                tempName = val;
+                                              });
+                                            },
+                                          ),
+                                          TextField(
+                                            decoration: const InputDecoration(hintText: "Email"),
+                                            onChanged: (val2){
+                                              setState((){
+                                                tempMail = val2;
+                                              });
+                                            },
+                                          ),
+                                          TextField(
+                                            decoration: const InputDecoration(hintText: "Password"),
+                                            onChanged: (val3){
+                                              setState((){
+                                                tempPass = val3;
+                                              });
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
                               child: Text("Add Account"),
                               style: ButtonStyle(
                                   backgroundColor: MaterialStateProperty.all<Color>(Color(0xff8269B8)),
@@ -255,9 +358,9 @@ class _homePage extends State<Home>{
                               child: Center(
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: const [
+                                    children: [
                                       Text(
-                                          "0",
+                                          totalPass.toString(),
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 25

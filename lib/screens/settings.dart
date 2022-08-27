@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_fadein/flutter_fadein.dart';
 
 class Settings extends StatefulWidget{
   @override
@@ -25,14 +26,18 @@ class _settings extends State<Settings>{
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      Text(
-                        "Settings",
-                        style: TextStyle(
-                            color: Color(0xffFFF9F9),
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold
+                      FadeIn(
+                        curve: Curves.easeIn,
+                        duration: Duration(milliseconds: 600),
+                        child: Text(
+                          "Settings",
+                          style: TextStyle(
+                              color: Color(0xffFFF9F9),
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold
+                          ),
                         ),
-                      ),
+                      )
                     ],
                   ),
                 ),

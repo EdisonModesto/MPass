@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-
+import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -68,14 +68,18 @@ class _generate extends State<Generate>{
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      Text(
-                        "Password Generator",
-                        style: TextStyle(
-                            color: Color(0xffFFF9F9),
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold
+                      FadeIn(
+                        curve: Curves.easeIn,
+                        duration: Duration(milliseconds: 600),
+                        child: Text(
+                          "Password Generator",
+                          style: TextStyle(
+                              color: Color(0xffFFF9F9),
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold
+                          ),
                         ),
-                      ),
+                      )
                     ],
                   ),
                 ),

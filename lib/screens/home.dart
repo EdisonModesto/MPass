@@ -4,6 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mpass/passwords.dart';
+import 'package:flutter_fadein/flutter_fadein.dart';
 
 
 class Home extends StatefulWidget{
@@ -78,7 +79,7 @@ class _homePage extends State<Home>{
 
   @override
   Widget build(BuildContext context){
-
+      _AccDetails.isShow = true;
     return SafeArea(
       child: Stack(
         children: [
@@ -90,21 +91,32 @@ class _homePage extends State<Home>{
                 child: Container(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "0",
-                        style: TextStyle(
-                            color: Color(0xffFFF9F9),
-                            fontSize: 34,
-                            fontWeight: FontWeight.bold
-                        ),
-                      ),
-                      Text(
-                        "Compromised Passwords",
-                        style: TextStyle(
-                          color: Color(0xffFFF9F9),
-                          fontSize: 18,
+                    children: const [
+                        FadeIn(
+                          curve: Curves.easeIn,
+                          duration: Duration(milliseconds: 600),
+                          child: Text(
+                            "0",
+                            style: TextStyle(
+                                color: Color(0xffFFF9F9),
+                                fontSize: 34,
+                                fontWeight: FontWeight.bold
 
+                            ),
+                          ),
+                        ),
+
+                      FadeIn(
+                        curve: Curves.easeIn,
+                        duration: Duration(milliseconds: 700),
+                        child: Text(
+                          "Compromised Passwords",
+                          style: TextStyle(
+                            color: Color(0xffFFF9F9),
+                            fontSize: 18,
+
+
+                          ),
                         ),
                       ),
                     ],

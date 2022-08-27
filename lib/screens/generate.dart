@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 
 class Generate extends StatefulWidget{
   @override
@@ -69,7 +72,7 @@ class _generate extends State<Generate>{
                         "Password Generator",
                         style: TextStyle(
                             color: Color(0xffFFF9F9),
-                            fontSize: 20,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold
                         ),
                       ),
@@ -117,7 +120,7 @@ class _generate extends State<Generate>{
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 20
+                                      fontSize: 17
                                   ),
                                 ),
                               ),
@@ -127,7 +130,7 @@ class _generate extends State<Generate>{
 
                       //password list
                       Expanded(
-                          flex: 73,
+                          flex: 71,
                           child: Container(
                             margin: EdgeInsets.only(top: 15, bottom: 10),
                             child: ListView.builder(
@@ -149,7 +152,13 @@ class _generate extends State<Generate>{
                                     ),
 
                                     trailing: IconButton(
-                                        onPressed: null,
+                                      padding: EdgeInsets.only(top: 10,bottom: 10),
+                                        onPressed: (){
+                                          Clipboard.setData(ClipboardData(
+                                              text: _Password[index]));
+
+                                          Fluttertoast.showToast(msg: "Password Copied!");
+                                          },
                                         icon: Image.asset("assets/images/copyicon.png")
                                     ),
                                     title: Column(
@@ -217,6 +226,7 @@ class _generate extends State<Generate>{
                           children: [
                             Container(
                               width: MediaQuery.of(context).size.width * 0.40,
+                              padding: EdgeInsets.only(left: 10, right: 10),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,7 +235,7 @@ class _generate extends State<Generate>{
                                     children: [
                                       SizedBox(
                                         height: 25,
-                                        width: 50,
+                                        width: 25,
                                         child: Checkbox(
                                           value: addSymbols,
                                           activeColor: Color(0xff8269B8),
@@ -239,14 +249,17 @@ class _generate extends State<Generate>{
                                           },
                                         ),
                                       ),
-                                      Text("Add Symbols")
+                                      Transform.translate(
+                                        offset: Offset(6, 0),
+                                        child: Text("Add Symbols"),
+                                      )
                                     ],
                                   ),
                                   Row(
                                     children: [
                                       SizedBox(
                                         height: 25,
-                                        width: 50,
+                                        width: 25,
                                         child: Checkbox(
                                           activeColor: Color(0xff8269B8),
                                           value: addLength,
@@ -261,7 +274,10 @@ class _generate extends State<Generate>{
                                           },
                                         ),
                                       ),
-                                      Text("Add Length")
+                                      Transform.translate(
+                                        child: Text("Add Length", textAlign: TextAlign.left),
+                                        offset: Offset(6, 0),
+                                      )
                                     ],
                                   )
                                 ],
@@ -278,18 +294,27 @@ class _generate extends State<Generate>{
                             Container(
                               width: MediaQuery.of(context).size.width * 0.40,
                               child: Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Image.asset(
-                                      "assets/images/settingsIcon.png",
-                                      width: 30,
-                                      height: 30,
+                                child: TextButton(
 
-                                    ),
-                                    const Text("Advanced\nSettings")
-                                  ],
-                                ),
+                                  onPressed: () {  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Image.asset(
+                                        "assets/images/settingsIcon.png",
+                                        width: 30,
+                                        height: 35,
+
+                                      ),
+                                      const Text(
+                                        "Advanced\nSettings", 
+                                        style: TextStyle(
+                                          color: Color(0xff000000)
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
                               ),
                             ),
                           ],

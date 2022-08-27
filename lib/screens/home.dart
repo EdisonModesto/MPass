@@ -140,7 +140,7 @@ class _homePage extends State<Home>{
                     children: [
                       //Text Label and Categories
                       Expanded(
-                          flex: 18,
+                          flex: 16,
                           child: Column(
                             children: [
                               //Text Lbl
@@ -152,7 +152,7 @@ class _homePage extends State<Home>{
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 20
+                                      fontSize: 17
                                   ),
                                 ),
                               ),
@@ -220,61 +220,7 @@ class _homePage extends State<Home>{
                                     width: MediaQuery.of(context).size.width * 1,
                                     margin: const EdgeInsets.only(bottom: 20),
                                     height: 50,
-                                    child: /* Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                         Container(
-                                              width: MediaQuery.of(context).size.width * .1,
-                                              padding: const EdgeInsets.only(
-                                                  top: 5, bottom: 5),
-                                              child: Image.asset(
-                                                  "assets/images/fbIcon.png"),
-                                            ),
-                                         Container(
-                                           width: MediaQuery.of(context).size.width * .56,
-                                                  padding: const EdgeInsets.only(
-                                                  left: 10),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment
-                                                    .start,
-                                                mainAxisAlignment: MainAxisAlignment
-                                                    .spaceEvenly,
-                                                children: [
-                                                  Text(
-
-                                                    _AccDetails.Title[index],
-                                                    style: TextStyle(
-                                                        fontWeight: FontWeight
-                                                            .bold),
-                                                  ),
-                                                  AutoSizeText(
-                                                    _AccDetails.Email[index],
-                                                    //_Emails![index],
-                                                    style: TextStyle(fontSize: 14),
-                                                    maxLines: 1,
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                        Container(
-                                          width: MediaQuery.of(context).size.width * .1,
-                                            child: IconButton(
-                                              onPressed: () {
-                                                Clipboard.setData(ClipboardData(
-                                                    text: _AccDetails.Password[index]));
-                                                Fluttertoast.showToast(
-                                                    msg: "Password Copied!");
-                                              },
-                                              icon: Image.asset(
-                                                  "assets/images/copyicon.png"),
-                                              padding: const EdgeInsets.only(
-                                                  top: 10, bottom: 10),
-                                            ),
-                                        )
-                                      ],
-                                    ) */
-
-                                    ListTile(
+                                    child: ListTile(
                                         onTap: (){
                                           setState((){
                                             _AccDetails.Title.removeAt(index);

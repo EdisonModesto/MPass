@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mpass/screens/generate.dart';
 import 'package:mpass/screens/home.dart';
+import 'package:mpass/screens/settings.dart';
 
 void main() {
   runApp(const MyApp());
@@ -66,12 +67,17 @@ class _MyHomePageState extends State<MyHomePage> {
       resizeToAvoidBottomInset: false,
 
       body: PageView(
+        controller: PageController(initialPage: 1),
         children: [
+          //Settings
+          Settings(),
+
           //Home
           Home(),
           
           //Generate
           Generate()
+
         ],
       )
 

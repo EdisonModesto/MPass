@@ -38,6 +38,8 @@ dependencies:
   auto_size_text: ^3.0.0
   fluttertoast: ^8.0.9
   flutter_fadein: ^2.0.0
+  http: ^0.13.5
+  crypto: ^3.0.2
 
 dev_dependencies:
   flutter_test:

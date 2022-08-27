@@ -9,7 +9,7 @@ class Settings extends StatefulWidget{
 
 class _settings extends State<Settings>{
 
-  List<String> settingsLbl = ["Scan Settings", "Backup Settings", "Security", "Privacy and Policy"];
+  List<String> settingsLbl = ["Scan Settings", "Backup Settings", "Appearance", "Privacy and Policy"];
 
   @override
   Widget build(BuildContext context) {

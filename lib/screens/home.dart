@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -5,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mpass/passwords.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
+import 'package:http/http.dart';
+import 'package:crypto/crypto.dart';
 
 
 class Home extends StatefulWidget{
@@ -24,6 +29,8 @@ class _homePage extends State<Home>{
 
   //passwords
   accDetails _AccDetails = new accDetails();
+
+  int compromised = 0;
 
     _getPasswords() async {
       final PasswordPref = await SharedPreferences.getInstance();
@@ -58,6 +65,7 @@ class _homePage extends State<Home>{
           });
 
       _savePasswords();
+      _checkBreached();
     }
 
   _savePasswords() async{
@@ -70,9 +78,41 @@ class _homePage extends State<Home>{
     await PasswordPref.setStringList('Passwords', _AccDetails.Password);
   }
 
+
+  _checkBreached()async{
+      var tempTotalCompro = 0;
+
+      Timer(Duration(seconds: 3), () async{
+        for(int i = 0; i < _AccDetails.Title.length; i++) {
+          var hashedPass = sha1.convert(utf8.encode(_AccDetails.Password[i])).toString();
+          print(hashedPass);
+          print(hashedPass.substring(5, hashedPass.length));
+          var trimHash = hashedPass.substring(0, 5);
+          var remainHash = hashedPass.substring(5, hashedPass.length);
+          Response response = await get(Uri.parse("https://api.pwnedpasswords.com/range/$trimHash"));
+          LineSplitter splt = LineSplitter();
+          List<String> SplittedResponse = splt.convert(response.body);
+          //print(SplittedResponse);
+          for(int j = 0; j < SplittedResponse.length; j++){
+            //print(SplittedResponse[j] + " : " + remainHash+ "\n");
+            if(SplittedResponse[j].contains(remainHash.toUpperCase())){
+              print("found");
+              tempTotalCompro +=1;
+            }
+          }
+        }
+        setState((){
+          compromised = tempTotalCompro;
+        });
+        print("Checking done");
+      //print(SplittedResponse);
+      });
+    }
+
   @override
   void initState() {
     _getPasswords();
+    _checkBreached();
     super.initState();
   }
 
@@ -91,12 +131,12 @@ class _homePage extends State<Home>{
                 child: Container(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                         FadeIn(
                           curve: Curves.easeIn,
                           duration: Duration(milliseconds: 600),
                           child: Text(
-                            "0",
+                            compromised.toString(),
                             style: TextStyle(
                                 color: Color(0xffFFF9F9),
                                 fontSize: 34,
@@ -158,22 +198,60 @@ class _homePage extends State<Home>{
                               //Text Lbl
                               Container(
                                 width: MediaQuery.of(context).size.width * 1,
+                                height: 25,
                                 margin: EdgeInsets.only(bottom: 10),
-                                child: const Text(
-                                  "Password Vault",
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 17
-                                  ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "Password Vault",
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 17
+                                      ),
+                                    ),
+                                    IconButton(
+                                        iconSize: 20,
+                                        padding: EdgeInsets.all(0),
+                                        onPressed: (){
+                                          showDialog(context: context, builder: (_){
+                                            return Center(
+                                              child: Card(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(30.0),
+                                                ),
+                                                child: Container(
+                                                    padding: EdgeInsets.only(left: 20, right: 20),
+                                                    decoration: const BoxDecoration(
+                                                      color: Color(0xffFFF9F9),
+                                                      borderRadius: BorderRadius.all(Radius.circular(50))
+                                                    ),
+                                                    width: MediaQuery.of(context).size.width * 0.8,
+                                                    height: 50,
+                                                    child: Column(
+                                                      children: [
+                                                        TextField(
+                                                          decoration: const InputDecoration(
+                                                              hintText: "Search Account",
+                                                              border: InputBorder.none),
+                                                        )
+                                                      ],
+                                                    )
+                                                ),
+                                              )
+                                            );
+                                          });
+                                        },
+                                        icon: Icon(Icons.search)
+                                    )
+                                  ],
                                 ),
                               ),
                               //Button Row
-                              Expanded(
-                                  flex: 50,
-                                  child: Container(
+                                   Container(
                                     width: MediaQuery.of(context).size.width * 1,
-                                    height: 60,
+                                    height: 33,
                                     child: ListView.builder(
                                       itemCount: _category.length,
                                       scrollDirection: Axis.horizontal,
@@ -214,8 +292,6 @@ class _homePage extends State<Home>{
 
                                     ) ,
                                   )
-
-                              ),
                             ],
                           )
                       ),
@@ -240,6 +316,7 @@ class _homePage extends State<Home>{
                                             _AccDetails.Password.removeAt(index);
                                           });
                                           _savePasswords();
+                                          _checkBreached();
                                           Fluttertoast.showToast(msg: "Account Removed");
                                         },
                                         contentPadding: const EdgeInsets.all(0),

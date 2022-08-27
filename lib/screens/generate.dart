@@ -12,15 +12,31 @@ class _generate extends State<Generate>{
   //String _Password = "";
   List<String> _Password = ["a", "a", "a", "a"];
 
+  //symbol length boolean
+  bool addSymbols = false;
+  bool addLength = false;
+
   _generatePasswords(){
     setState(() {
       var rand = Random();
+
+      int sizeRange = 61;
+      int lengthRange = 8;
+
+      if(addSymbols == true){
+        sizeRange = 104;
+      }
+
+      if(addLength == true){
+        lengthRange = 14;
+      }
+
       _Password = ["a", "a", "a", "a"];
-      String strCollection = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789!_&@";
+      String strCollection = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789!_&@123456789!_&@123456789!_&@123456789!_&@";
       for(int j = 0; j < 4; j++){
         String temp = "";
-        for(int i = 0; i < 8; i++){
-         temp += strCollection[rand.nextInt(65)];
+        for(int i = 0; i < lengthRange; i++){
+         temp += strCollection[rand.nextInt(sizeRange)];
         }
         _Password.insert(j ,temp);
       }
@@ -206,21 +222,44 @@ class _generate extends State<Generate>{
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    children: const [
+                                    children: [
                                       SizedBox(
                                         height: 25,
                                         width: 50,
-                                        child: Checkbox(value: false, onChanged: null,),
+                                        child: Checkbox(
+                                          value: addSymbols,
+                                          activeColor: Color(0xff8269B8),
+                                          onChanged: (value){
+                                            setState((){});
+                                            if(value == true){
+                                              addSymbols = true;
+                                            } else{
+                                              addSymbols = false;
+                                            }
+                                          },
+                                        ),
                                       ),
                                       Text("Add Symbols")
                                     ],
                                   ),
                                   Row(
-                                    children: const [
+                                    children: [
                                       SizedBox(
                                         height: 25,
                                         width: 50,
-                                        child: Checkbox(value: false, onChanged: null,),
+                                        child: Checkbox(
+                                          activeColor: Color(0xff8269B8),
+                                          value: addLength,
+                                          onChanged: (value){
+
+                                            setState((){});
+                                            if(value == true){
+                                              addLength = true;
+                                            } else{
+                                              addLength = false;
+                                            }
+                                          },
+                                        ),
                                       ),
                                       Text("Add Length")
                                     ],

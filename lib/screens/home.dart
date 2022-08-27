@@ -1,13 +1,16 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mpass/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mpass/passwords.dart';
 
 
 class Home extends StatefulWidget{
+  const Home({Key? key}) : super(key: key);
+
   @override
-  _homePage createState() => new _homePage();
+  _homePage createState() => _homePage();
 }
 
 class _homePage extends State<Home>{
@@ -16,55 +19,66 @@ class _homePage extends State<Home>{
   List<String> _category = ["All", "Most Used", "Social", "Work"];
   List _catSelected = [false, false, false, false];
 
+  final PasswordPref = SharedPreferences.getInstance();
+
   //passwords
-  List<String>? _Titles = [];
-  List<String>? _Emails = [];
-  List<String>? _Passwords = [];
-
-  int totalPass = 0;
-
+  accDetails _AccDetails = new accDetails();
 
     _getPasswords() async {
-      final IconPref = await SharedPreferences.getInstance();
-      final TitlePref = await SharedPreferences.getInstance();
-      final EmailPref = await SharedPreferences.getInstance();
       final PasswordPref = await SharedPreferences.getInstance();
 
+
       setState(() {
-        _Titles = TitlePref.getStringList('Titles')!;
-        _Emails = EmailPref.getStringList('Emails')!;
-        _Passwords = PasswordPref.getStringList('Passwords')!;
+
+        _AccDetails.Title = PasswordPref.getStringList('Titles')!;
+        _AccDetails.Email = PasswordPref.getStringList('Emails')!;
+        _AccDetails.Password = PasswordPref.getStringList('Passwords')!;
       });
+
+      print("Loaded" + _AccDetails.Title.toString() + ", " + _AccDetails.Email.toString()+ ","+ _AccDetails.Password.toString());
     }
 
+    _addPasswords(tempName, tempMail, tempPass){
 
-  _savePasswords(String tempTitle, String tempEmail, String tempPass) async{
 
-    final IconPref = await SharedPreferences.getInstance();
-    final TitlePref = await SharedPreferences.getInstance();
-    final EmailPref = await SharedPreferences.getInstance();
+          setState(() {
+            _AccDetails.Title.add(tempName);
+            print(_AccDetails.Title);
+          });
+
+          setState((){
+            _AccDetails.Email.add(tempMail);
+            print(_AccDetails.Email);
+          });
+
+          setState((){
+            _AccDetails.Password.add(tempPass);
+            print(_AccDetails.Password);
+          });
+
+      _savePasswords();
+    }
+
+  _savePasswords() async{
+
+
     final PasswordPref = await SharedPreferences.getInstance();
 
-    setState((){
-      _Titles?.add(tempTitle);
-      _Emails?.add(tempEmail);
-      _Passwords?.add(tempPass);
-      totalPass += 1;
-    });
-
-    await TitlePref.setStringList('Titles', _Titles!);
-    await EmailPref.setStringList('Emails', _Emails!);
-    await PasswordPref.setStringList('Passwords', _Passwords!);
+    await PasswordPref.setStringList('Titles', _AccDetails.Title);
+    await PasswordPref.setStringList('Emails', _AccDetails.Email);
+    await PasswordPref.setStringList('Passwords', _AccDetails.Password);
   }
 
-
+  @override
+  void initState() {
+    _getPasswords();
+    super.initState();
+  }
 
 
   @override
   Widget build(BuildContext context){
 
-      _getPasswords();
-      totalPass = _Titles!.length;
     return SafeArea(
       child: Stack(
         children: [
@@ -76,7 +90,7 @@ class _homePage extends State<Home>{
                 child: Container(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Text(
                         "0",
                         style: TextStyle(
@@ -196,49 +210,132 @@ class _homePage extends State<Home>{
 
                       //password list
                       Expanded(
-                          flex: 70,
+                          flex: 63,
                           child: Container(
                             margin: EdgeInsets.only(top: 10, bottom: 10),
                             child: ListView.builder(
-                              itemCount: _Titles?.length ?? 0,
+                              itemCount: _AccDetails.Title.length,
                               itemBuilder: (BuildContext context, int index){
                                 return Container(
-                                  width: MediaQuery.of(context).size.width * 1,
-                                  margin: const EdgeInsets.only(bottom: 20),
-                                  height: 50,
-                                  child: ListTile(
-                                    contentPadding: const EdgeInsets.all(0),
-                                    leading: Container(
-                                      padding: const EdgeInsets.only(top: 5, bottom: 5),
-                                      child: Image.asset("assets/images/fbIcon.png"),
-                                    ),
+                                    width: MediaQuery.of(context).size.width * 1,
+                                    margin: const EdgeInsets.only(bottom: 20),
+                                    height: 50,
+                                    child: /* Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                         Container(
+                                              width: MediaQuery.of(context).size.width * .1,
+                                              padding: const EdgeInsets.only(
+                                                  top: 5, bottom: 5),
+                                              child: Image.asset(
+                                                  "assets/images/fbIcon.png"),
+                                            ),
+                                         Container(
+                                           width: MediaQuery.of(context).size.width * .56,
+                                                  padding: const EdgeInsets.only(
+                                                  left: 10),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment
+                                                    .start,
+                                                mainAxisAlignment: MainAxisAlignment
+                                                    .spaceEvenly,
+                                                children: [
+                                                  Text(
 
-                                    trailing: IconButton(
-                                        onPressed: null,
-                                        icon: Image.asset("assets/images/copyicon.png"),
-                                      padding: const EdgeInsets.only(top: 10, bottom: 10),
-                                    ),
-                                    title: Container(
-                                      padding: const EdgeInsets.only(left: 10),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Text(
+                                                    _AccDetails.Title[index],
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight
+                                                            .bold),
+                                                  ),
+                                                  AutoSizeText(
+                                                    _AccDetails.Email[index],
+                                                    //_Emails![index],
+                                                    style: TextStyle(fontSize: 14),
+                                                    maxLines: 1,
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                        Container(
+                                          width: MediaQuery.of(context).size.width * .1,
+                                            child: IconButton(
+                                              onPressed: () {
+                                                Clipboard.setData(ClipboardData(
+                                                    text: _AccDetails.Password[index]));
+                                                Fluttertoast.showToast(
+                                                    msg: "Password Copied!");
+                                              },
+                                              icon: Image.asset(
+                                                  "assets/images/copyicon.png"),
+                                              padding: const EdgeInsets.only(
+                                                  top: 10, bottom: 10),
+                                            ),
+                                        )
+                                      ],
+                                    ) */
 
-                                            _Titles![index],
-                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                    ListTile(
+                                        onTap: (){
+                                          setState((){
+                                            _AccDetails.Title.removeAt(index);
+                                            _AccDetails.Email.removeAt(index);
+                                            _AccDetails.Password.removeAt(index);
+                                          });
+                                          _savePasswords();
+                                          Fluttertoast.showToast(msg: "Account Removed");
+                                        },
+                                        contentPadding: const EdgeInsets.all(0),
+                                        leading: Container(
+                                          padding: const EdgeInsets.only(
+                                              top: 5, bottom: 5),
+                                          child: Image.asset(
+                                              "assets/images/fbIcon.png"),
+                                        ),
+
+                                        trailing: IconButton(
+                                          onPressed: () {
+                                            Clipboard.setData(ClipboardData(
+                                                text: _AccDetails.Password[index]));
+                                            Fluttertoast.showToast(
+                                                msg: "Password Copied!");
+                                          },
+                                          icon: Image.asset(
+                                              "assets/images/copyicon.png"),
+                                          padding: const EdgeInsets.only(
+                                              top: 10, bottom: 10),
+                                        ),
+                                        title: Container(
+                                          padding: const EdgeInsets.only(
+                                              left: 10),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment
+                                                .start,
+                                            mainAxisAlignment: MainAxisAlignment
+                                                .spaceEvenly,
+                                            children: [
+                                              Text(
+
+                                                _AccDetails.Title[index],
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight
+                                                        .bold),
+                                              ),
+                                              AutoSizeText(
+                                                _AccDetails.Email[index],
+                                                //_Emails![index],
+                                                style: TextStyle(fontSize: 14),
+                                                maxLines: 1,
+                                              )
+                                            ],
                                           ),
-                                          AutoSizeText(
-                                            _Emails![index],
-                                            style: TextStyle(fontSize: 14),
-                                            maxLines: 1,
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  ),
-                                );
+                                        )
+                                    ),
+
+
+
+                                  );
+
+
                               },
                               shrinkWrap: true,
                               padding: EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 5),
@@ -257,14 +354,15 @@ class _homePage extends State<Home>{
                             color: Color(0xffA491CD),
                             width: MediaQuery.of(context).size.width * 1,
                             child: ElevatedButton(
-                              onPressed: () async{
-
-                                String tempName = "";
-                                String tempMail = "";
-                                String tempPass = "";
-                                //final TextEditingController _controller = TextEditingController();
+                              onPressed: () {
+                                String tempName = "a";
+                                String tempMail = "a";
+                                String tempPass = "a";
+                                final TextEditingController _titleCon = TextEditingController();
+                                final TextEditingController _emailCon = TextEditingController();
+                                final TextEditingController _passCon = TextEditingController();
                                 showDialog(context: context, builder: (_) =>
-                                  AlertDialog(
+                                  AlertDialog (
                                     title: const Text(
                                       "Add Account",
                                       style: TextStyle(fontWeight: FontWeight.bold),
@@ -279,7 +377,7 @@ class _homePage extends State<Home>{
                                       ),
                                       TextButton(
                                           onPressed: (){
-                                              _savePasswords(tempName, tempMail, tempPass);
+                                            _addPasswords(tempName,_emailCon.text,_passCon.text);
                                             Navigator.pop(context, true);
                                           },
 
@@ -296,25 +394,28 @@ class _homePage extends State<Home>{
                                             decoration: const InputDecoration(hintText: "App Name"),
                                             onChanged: (val) {
                                               setState((){
-                                                tempName = val;
+                                                tempName = _titleCon.text;
                                               });
                                             },
+                                            controller: _titleCon,
                                           ),
                                           TextField(
                                             decoration: const InputDecoration(hintText: "Email"),
                                             onChanged: (val2){
                                               setState((){
-                                                tempMail = val2;
+                                                tempMail = _emailCon.text;
                                               });
                                             },
+                                            controller: _emailCon,
                                           ),
                                           TextField(
                                             decoration: const InputDecoration(hintText: "Password"),
                                             onChanged: (val3){
                                               setState((){
-                                                tempPass = val3;
+                                                tempPass = _passCon.text;
                                               });
                                             },
+                                            controller: _passCon,
                                           )
                                         ],
                                       ),
@@ -329,7 +430,8 @@ class _homePage extends State<Home>{
                                   minimumSize: MaterialStateProperty.all<Size>(Size(MediaQuery.of(context).size.width * 0.8, 50))
 
                               ),
-                            )),
+                            )
+                        ),
                       )
                     ],
                   ),
@@ -360,8 +462,8 @@ class _homePage extends State<Home>{
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Text(
-                                          totalPass.toString(),
-                                        style: TextStyle(
+                                        _AccDetails.Title.length.toString(),
+                                        style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 25
                                         ),

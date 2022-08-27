@@ -4,7 +4,8 @@ import 'package:mpass/screens/generate.dart';
 import 'package:mpass/screens/home.dart';
 import 'package:mpass/screens/settings.dart';
 
-void main() {
+void main() async {
+  await Future.delayed(const Duration(milliseconds: 200));
   runApp(const MyApp());
 }
 
@@ -61,7 +62,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  late PageController controller;
+
+  @override
+  void initState() {
+    late PageController controller;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

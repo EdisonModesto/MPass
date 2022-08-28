@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:mpass/compromised.dart';
+import 'package:mpass/compromisedList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/services.dart';
@@ -33,6 +35,9 @@ class _homePage extends State<Home>{
 
   //passwords
   accDetails _AccDetails = new accDetails();
+  Compromised _Compromised = new Compromised();
+
+  //category lists
   searchList _searchList = new searchList();
   mostUsed _mostUsed = new mostUsed();
   social _social = new social();
@@ -67,6 +72,7 @@ class _homePage extends State<Home>{
             _searchList.Title.add(_AccDetails.Title[i]);
             _searchList.Email.add(_AccDetails.Email[i]);
             _searchList.Password.add(_AccDetails.Password[i]);
+            _searchList.pointer.add(i);
           });
         }
       }
@@ -122,7 +128,7 @@ class _homePage extends State<Home>{
     _checkBreached()async{
       var tempTotalCompro = 0;
 
-      Timer(Duration(seconds: 3), () async{
+      Timer(const Duration(seconds: 3), () async{
         for(int i = 0; i < _AccDetails.Title.length; i++) {
           var hashedPass = sha1.convert(utf8.encode(_AccDetails.Password[i])).toString();
           print(hashedPass);
@@ -130,20 +136,89 @@ class _homePage extends State<Home>{
           var trimHash = hashedPass.substring(0, 5);
           var remainHash = hashedPass.substring(5, hashedPass.length);
           Response response = await get(Uri.parse("https://api.pwnedpasswords.com/range/$trimHash"));
-          LineSplitter splt = LineSplitter();
+          LineSplitter splt = const LineSplitter();
           List<String> SplittedResponse = splt.convert(response.body);
           //print(SplittedResponse);
           for(int j = 0; j < SplittedResponse.length; j++){
             //print(SplittedResponse[j] + " : " + remainHash+ "\n");
             if(SplittedResponse[j].contains(remainHash.toUpperCase())){
-              print("found");
               tempTotalCompro +=1;
+              _Compromised.Title.add(_AccDetails.Title[i]);
+              _Compromised.Email.add(_AccDetails.Email[i]);
+              _Compromised.Password.add(_AccDetails.Password[i]);
+              _Compromised.pointer.add(i);
             }
           }
         }
         setState((){
           compromised = tempTotalCompro;
         });
+
+        if(compromised != 0){
+          showBottomSheet(context: context, builder: (BuildContext context){
+            return Container(
+              color: Colors.redAccent,
+              height: 200,
+              width: MediaQuery.of(context).size.width * 1,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.warning,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                  const Text(
+                    "Compromised Passwords\nFound",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+
+                    ),
+                  ),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(
+                        color: Colors.white,
+                        width: 1.5
+                      )
+                    ),
+                      onPressed: (){
+                        Navigator.pop(context);
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context){
+                              return Center(
+                                child: Card(
+                                  child: Container(
+                                    height: 500,
+                                    width: MediaQuery.of(context).size.width * 0.8,
+                                    color: Colors.white60,
+                                    child: ListView.builder(
+                                      itemCount: _Compromised.Title.length,
+                                      itemBuilder: (BuildContext context, int index) {
+                                        return ListTile(
+                                          title: Text(_Compromised.Title[index]),
+                                        );
+                                      },
+
+                                    ),
+                                  ),
+                                )
+                              );
+                            });
+                      },
+                      child: const Text("Show Compromised Passwords", style: TextStyle(color: Colors.white),)
+                  )
+                ],
+              )
+            );
+          },
+          );
+        }
         print("Checking done");
       //print(SplittedResponse);
       });
@@ -179,11 +254,11 @@ class _homePage extends State<Home>{
                     children: [
                         FadeIn(
                           curve: Curves.easeIn,
-                          duration: Duration(milliseconds: 600),
+                          duration: const Duration(milliseconds: 600),
                           child: Text(
                             compromised.toString(),
-                            style: TextStyle(
-                                color: Color(0xffFFF9F9),
+                            style: const TextStyle(
+                                color: const Color(0xffFFF9F9),
                                 fontSize: 34,
                                 fontWeight: FontWeight.bold
 
@@ -191,13 +266,13 @@ class _homePage extends State<Home>{
                           ),
                         ),
 
-                      FadeIn(
+                      const FadeIn(
                         curve: Curves.easeIn,
                         duration: Duration(milliseconds: 700),
                         child: Text(
                           "Compromised Passwords",
                           style: TextStyle(
-                            color: Color(0xffFFF9F9),
+                            color: const Color(0xffFFF9F9),
                             fontSize: 18,
 
 
@@ -244,7 +319,7 @@ class _homePage extends State<Home>{
                               Container(
                                 width: MediaQuery.of(context).size.width * 1,
                                 height: 25,
-                                margin: EdgeInsets.only(bottom: 10),
+                                margin: const EdgeInsets.only(bottom: 10),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
@@ -258,7 +333,7 @@ class _homePage extends State<Home>{
                                     ),
                                     IconButton(
                                         iconSize: 20,
-                                        padding: EdgeInsets.all(0),
+                                        padding: const EdgeInsets.all(0),
                                         onPressed: (){
                                           showDialog(context: context, builder: (_){
                                             return Center(
@@ -267,7 +342,7 @@ class _homePage extends State<Home>{
                                                   borderRadius: BorderRadius.circular(30.0),
                                                 ),
                                                 child: Container(
-                                                    padding: EdgeInsets.only(left: 10, right: 10),
+                                                    padding: const EdgeInsets.only(left: 10, right: 10),
                                                     decoration: const BoxDecoration(
                                                       color: Color(0xffFFF9F9),
                                                       borderRadius: BorderRadius.all(Radius.circular(50))
@@ -298,14 +373,14 @@ class _homePage extends State<Home>{
                                             );
                                           });
                                         },
-                                        icon: Icon(Icons.search),
+                                        icon: const Icon(Icons.search),
 
                                     )
                                   ],
                                 ),
                               ),
                               //Button Row
-                                   Container(
+                                   SizedBox(
                                     width: MediaQuery.of(context).size.width * 1,
                                     height: 33,
                                     child: ListView.builder(
@@ -313,7 +388,7 @@ class _homePage extends State<Home>{
                                       scrollDirection: Axis.horizontal,
                                       itemBuilder: (BuildContext context, int index){
                                         return Container(
-                                          margin: EdgeInsets.only(right: 10),
+                                          margin: const EdgeInsets.only(right: 10),
                                           child: OutlinedButton(
                                             onPressed: () => {
                                               setState((){
@@ -328,24 +403,24 @@ class _homePage extends State<Home>{
                                             },
                                             style: OutlinedButton.styleFrom(
                                                 side: BorderSide(
-                                                    color: _catSelected[index] ? Color(0xffA491CD) : Color(0xff8269B8), width: 1
+                                                    color: _catSelected[index] ? const Color(0xffA491CD) : const Color(0xff8269B8), width: 1
                                                 ),
 
-                                                backgroundColor: _catSelected[index] ? Color(0xffA491CD) : Color(0xffFFF9F9),
-                                                minimumSize: Size(20, 0.5)
+                                                backgroundColor: _catSelected[index] ? const Color(0xffA491CD) : const Color(0xffFFF9F9),
+                                                minimumSize: const Size(20, 0.5)
 
                                             ),
                                             child: Text(
                                               _category[index],
                                               style: TextStyle(
-                                                color: _catSelected[index] ? Color(0xffFFF9F9) : Color(0xff000000),
+                                                color: _catSelected[index] ? const Color(0xffFFF9F9) : const Color(0xff000000),
                                               ),
                                             ),
                                           ),
                                         );
                                       },
                                       shrinkWrap: true,
-                                      padding: EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 5),
+                                      padding: const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 5),
 
                                     ) ,
                                   )
@@ -357,7 +432,7 @@ class _homePage extends State<Home>{
                       Expanded(
                           flex: 63,
                           child: Container(
-                            margin: EdgeInsets.only(top: 10, bottom: 10),
+                            margin: const EdgeInsets.only(top: 10, bottom: 10),
                             child: ListView.builder(
                               itemCount: currentList[currIndex].Title.length,
                               itemBuilder: (BuildContext context, int index){
@@ -367,14 +442,115 @@ class _homePage extends State<Home>{
                                     height: 50,
                                     child: ListTile(
                                         onTap: (){
-                                          setState((){
-                                            currentList[currIndex].Title.removeAt(index);
-                                            currentList[currIndex].Email.removeAt(index);
-                                            currentList[currIndex].Password.removeAt(index);
+                                          showDialog(context: context, builder: (BuildContext context){
+                                            return Center(
+                                              child: Card(
+                                                shape: const RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(Radius.circular(15))
+                                                ),
+                                                child: Container(
+                                                padding: const EdgeInsets.only(top: 20, bottom: 10, right: 25, left: 25),
+                                                width: MediaQuery.of(context).size.width * 0.7,
+                                                height: 230,
+                                                decoration: const BoxDecoration(
+                                                  color: Color(0xffFFF9F9),
+                                                  borderRadius: BorderRadius.all(Radius.circular(15))
+                                                ),
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      currentList[currIndex].Title[index],
+                                                      style: const TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 20,
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Icon(Icons.email),
+                                                        Expanded(
+                                                            child: Text(" : " + currentList[currIndex].Email[index]),
+                                                        ),
+                                                        IconButton(
+                                                            onPressed: (){
+                                                              Clipboard.setData(ClipboardData(
+                                                                  text: currentList[currIndex].Email[index]));
+                                                              Fluttertoast.showToast(msg: "Email Copied!");
+                                                            },
+                                                            icon: Image.asset("assets/images/copyicon.png", width: 25, height: 25,)
+                                                        )
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Icon(Icons.password),
+                                                        Expanded(
+                                                            child: Text(" : " + currentList[currIndex].Password[index]),
+                                                        ),
+                                                        IconButton(
+                                                            onPressed: (){
+                                                              Clipboard.setData(ClipboardData(
+                                                                  text: currentList[currIndex].Password[index]));
+                                                              Fluttertoast.showToast(msg: "Password Copied");
+                                                            },
+                                                            icon: Image.asset("assets/images/copyicon.png", width: 25, height: 25,))
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        TextButton(
+                                                            onPressed: (){
+
+                                                              if(currIndex == 0){
+                                                                setState((){
+                                                                  currentList[currIndex].Title.removeAt(index);
+                                                                  currentList[currIndex].Email.removeAt(index);
+                                                                  currentList[currIndex].Password.removeAt(index);
+                                                                });
+                                                              } else if(currIndex == 4) {
+                                                                setState((){
+                                                                  //deletes from main list
+                                                                  _AccDetails.Title.removeAt(_searchList.pointer[index]);
+                                                                  _AccDetails.Email.removeAt(_searchList.pointer[index]);
+                                                                  _AccDetails.Password.removeAt(_searchList.pointer[index]);
+
+                                                                  //deletes from search list
+                                                                  currentList[currIndex].Title.removeAt(index);
+                                                                  currentList[currIndex].Email.removeAt(index);
+                                                                  currentList[currIndex].Password.removeAt(index);
+                                                                });
+                                                              }
+                                                              _savePasswords();
+
+                                                              Fluttertoast.showToast(msg: "Account Removed");
+                                                              _savePasswords();
+                                                              Navigator.pop(context);
+                                                            },
+                                                            child: const Text(
+                                                                "Delete",
+                                                              style: TextStyle(
+                                                                color: Colors.redAccent
+                                                              ),
+                                                            )
+                                                        ),
+                                                        TextButton(
+                                                            onPressed: (){
+                                                              Navigator.pop(context);
+                                                            },
+                                                            child: Text("Close")
+                                                        ),
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              )
+                                            );
                                           });
-                                          _savePasswords();
-                                          _checkBreached();
-                                          Fluttertoast.showToast(msg: "Account Removed");
                                         },
                                         contentPadding: const EdgeInsets.all(0),
                                         leading: Container(
@@ -408,14 +584,14 @@ class _homePage extends State<Home>{
                                               Text(
 
                                                 currentList[currIndex].Title[index],
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                     fontWeight: FontWeight
                                                         .bold),
                                               ),
                                               AutoSizeText(
                                                 currentList[currIndex].Email[index],
                                                 //_Emails![index],
-                                                style: TextStyle(fontSize: 14),
+                                                style: const TextStyle(fontSize: 14),
                                                 maxLines: 1,
                                               )
                                             ],
@@ -430,7 +606,7 @@ class _homePage extends State<Home>{
 
                               },
                               shrinkWrap: true,
-                              padding: EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 5),
+                              padding: const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 5),
 
                             ) ,
 
@@ -443,7 +619,7 @@ class _homePage extends State<Home>{
                         //button
                         flex: 13,
                         child: Container(
-                            color: Color(0xffA491CD),
+                            color: const Color(0xffA491CD),
                             width: MediaQuery.of(context).size.width * 1,
                             child: ElevatedButton(
                               onPressed: () {
@@ -515,10 +691,10 @@ class _homePage extends State<Home>{
                                   ),
                                 );
                               },
-                              child: Text("Add Account"),
+                              child: const Text("Add Account"),
                               style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all<Color>(Color(0xff8269B8)),
-                                  foregroundColor: MaterialStateProperty.all<Color>(Color(0xffFFF9F9)),
+                                  backgroundColor: MaterialStateProperty.all<Color>(const Color(0xff8269B8)),
+                                  foregroundColor: MaterialStateProperty.all<Color>(const Color(0xffFFF9F9)),
                                   minimumSize: MaterialStateProperty.all<Size>(Size(MediaQuery.of(context).size.width * 0.8, 50))
 
                               ),
@@ -541,7 +717,7 @@ class _homePage extends State<Home>{
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: Card(
-                      color: Color(0xffFFF9F9),
+                      color: const Color(0xffFFF9F9),
                       child: Container(
                         height: MediaQuery.of(context).size.height * .1,
                         child: Row(
@@ -560,16 +736,16 @@ class _homePage extends State<Home>{
                                           fontSize: 25
                                         ),
                                       ),
-                                      Text("Total\nPasswords")
+                                      const Text("Total\nPasswords")
                                     ],
                                   ),
                               ),
                             ),
                             Container(
-                              margin: EdgeInsets.only(top: 15, bottom: 15),
+                              margin: const EdgeInsets.only(top: 15, bottom: 15),
                               width: MediaQuery.of(context).size.width * 0.01,
                               decoration: BoxDecoration(
-                                color: Color(0xffBAABDA),
+                                color: const Color(0xffBAABDA),
                                 borderRadius: BorderRadius.circular(15)
                               ),
                             ),

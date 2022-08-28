@@ -7,6 +7,10 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mpass/passwords.dart';
+import 'package:mpass/categories/search.dart';
+import 'package:mpass/categories/mostUsed.dart';
+import 'package:mpass/categories/work.dart';
+import 'package:mpass/categories/social.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:http/http.dart';
 import 'package:crypto/crypto.dart';
@@ -23,14 +27,51 @@ class _homePage extends State<Home>{
 
   //categories Button and states
   List<String> _category = ["All", "Most Used", "Social", "Work"];
-  List _catSelected = [false, false, false, false];
+  List _catSelected = [true, false, false, false];
 
   final PasswordPref = SharedPreferences.getInstance();
 
   //passwords
   accDetails _AccDetails = new accDetails();
+  searchList _searchList = new searchList();
+  mostUsed _mostUsed = new mostUsed();
+  social _social = new social();
+  work _work = new work();
 
   int compromised = 0;
+  int _identical = 0;
+
+  List currentList = [];
+  int currIndex = 0;
+  
+  _searchPassword(String value) async{
+
+    _searchList.Title.clear();
+    _searchList.Email.clear();
+    _searchList.Password.clear();
+
+    if(value.isEmpty){
+      setState((){
+        currIndex = 0;
+        _catSelected.fillRange(0, _catSelected.length, false);
+        _catSelected[0] = true;
+      });
+    } else {
+      setState((){
+        currIndex = 4;
+        _catSelected.fillRange(0, _catSelected.length, false);
+      });
+      for (int i = 0; i < _AccDetails.Title.length; i++) {
+        if (_AccDetails.Title[i].contains(value)) {
+          setState(() {
+            _searchList.Title.add(_AccDetails.Title[i]);
+            _searchList.Email.add(_AccDetails.Email[i]);
+            _searchList.Password.add(_AccDetails.Password[i]);
+          });
+        }
+      }
+    }
+  }
 
     _getPasswords() async {
       final PasswordPref = await SharedPreferences.getInstance();
@@ -42,7 +83,6 @@ class _homePage extends State<Home>{
         _AccDetails.Email = PasswordPref.getStringList('Emails')!;
         _AccDetails.Password = PasswordPref.getStringList('Passwords')!;
       });
-
       print("Loaded" + _AccDetails.Title.toString() + ", " + _AccDetails.Email.toString()+ ","+ _AccDetails.Password.toString());
     }
 
@@ -68,7 +108,7 @@ class _homePage extends State<Home>{
       _checkBreached();
     }
 
-  _savePasswords() async{
+    _savePasswords() async{
 
 
     final PasswordPref = await SharedPreferences.getInstance();
@@ -79,7 +119,7 @@ class _homePage extends State<Home>{
   }
 
 
-  _checkBreached()async{
+    _checkBreached()async{
       var tempTotalCompro = 0;
 
       Timer(Duration(seconds: 3), () async{
@@ -109,10 +149,15 @@ class _homePage extends State<Home>{
       });
     }
 
+    _checkIdentical()async{
+      
+    }
+
   @override
   void initState() {
     _getPasswords();
     _checkBreached();
+    currentList = [_AccDetails,_mostUsed,_social,_work, _searchList,];
     super.initState();
   }
 
@@ -222,7 +267,7 @@ class _homePage extends State<Home>{
                                                   borderRadius: BorderRadius.circular(30.0),
                                                 ),
                                                 child: Container(
-                                                    padding: EdgeInsets.only(left: 20, right: 20),
+                                                    padding: EdgeInsets.only(left: 10, right: 10),
                                                     decoration: const BoxDecoration(
                                                       color: Color(0xffFFF9F9),
                                                       borderRadius: BorderRadius.all(Radius.circular(50))
@@ -232,9 +277,19 @@ class _homePage extends State<Home>{
                                                     child: Column(
                                                       children: [
                                                         TextField(
+                                                          onChanged: (value){
+                                                            _searchPassword(value);
+                                                          },
+                                                          onSubmitted: (value){
+                                                            _searchPassword(value);
+                                                            Navigator.pop(context, true);
+                                                          },
+
                                                           decoration: const InputDecoration(
                                                               hintText: "Search Account",
-                                                              border: InputBorder.none),
+                                                              border: InputBorder.none,
+                                                            prefixIcon: Icon(Icons.search)
+                                                          ),
                                                         )
                                                       ],
                                                     )
@@ -243,7 +298,8 @@ class _homePage extends State<Home>{
                                             );
                                           });
                                         },
-                                        icon: Icon(Icons.search)
+                                        icon: Icon(Icons.search),
+
                                     )
                                   ],
                                 ),
@@ -253,7 +309,7 @@ class _homePage extends State<Home>{
                                     width: MediaQuery.of(context).size.width * 1,
                                     height: 33,
                                     child: ListView.builder(
-                                      itemCount: _category.length,
+                                      itemCount: 4,
                                       scrollDirection: Axis.horizontal,
                                       itemBuilder: (BuildContext context, int index){
                                         return Container(
@@ -262,6 +318,7 @@ class _homePage extends State<Home>{
                                             onPressed: () => {
                                               setState((){
                                                 _catSelected[index] = true;
+                                                currIndex = index;
                                                 for(int i = 0; i < _category.length; i++){
                                                   if(i != index){
                                                     _catSelected[i] = false;
@@ -302,7 +359,7 @@ class _homePage extends State<Home>{
                           child: Container(
                             margin: EdgeInsets.only(top: 10, bottom: 10),
                             child: ListView.builder(
-                              itemCount: _AccDetails.Title.length,
+                              itemCount: currentList[currIndex].Title.length,
                               itemBuilder: (BuildContext context, int index){
                                 return Container(
                                     width: MediaQuery.of(context).size.width * 1,
@@ -311,9 +368,9 @@ class _homePage extends State<Home>{
                                     child: ListTile(
                                         onTap: (){
                                           setState((){
-                                            _AccDetails.Title.removeAt(index);
-                                            _AccDetails.Email.removeAt(index);
-                                            _AccDetails.Password.removeAt(index);
+                                            currentList[currIndex].Title.removeAt(index);
+                                            currentList[currIndex].Email.removeAt(index);
+                                            currentList[currIndex].Password.removeAt(index);
                                           });
                                           _savePasswords();
                                           _checkBreached();
@@ -330,7 +387,7 @@ class _homePage extends State<Home>{
                                         trailing: IconButton(
                                           onPressed: () {
                                             Clipboard.setData(ClipboardData(
-                                                text: _AccDetails.Password[index]));
+                                                text: currentList[currIndex].Password[index]));
                                             Fluttertoast.showToast(
                                                 msg: "Password Copied!");
                                           },
@@ -350,13 +407,13 @@ class _homePage extends State<Home>{
                                             children: [
                                               Text(
 
-                                                _AccDetails.Title[index],
+                                                currentList[currIndex].Title[index],
                                                 style: TextStyle(
                                                     fontWeight: FontWeight
                                                         .bold),
                                               ),
                                               AutoSizeText(
-                                                _AccDetails.Email[index],
+                                                currentList[currIndex].Email[index],
                                                 //_Emails![index],
                                                 style: TextStyle(fontSize: 14),
                                                 maxLines: 1,

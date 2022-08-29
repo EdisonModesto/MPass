@@ -40,6 +40,7 @@ dependencies:
   flutter_fadein: ^2.0.0
   http: ^0.13.5
   crypto: ^3.0.2
+  expandable: ^5.0.1
 
 dev_dependencies:
   flutter_test:

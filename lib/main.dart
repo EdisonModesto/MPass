@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mpass/passwords.dart';
 import 'package:mpass/screens/generate.dart';
 import 'package:mpass/screens/home.dart';
 import 'package:mpass/screens/settings.dart';
+
+import 'categories/mostUsed.dart';
+import 'categories/search.dart';
+import 'categories/social.dart';
+import 'categories/work.dart';
+import 'compromised.dart';
 
 void main() async {
   await Future.delayed(const Duration(milliseconds: 200));
@@ -61,7 +68,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
 
   @override
   void initState() {

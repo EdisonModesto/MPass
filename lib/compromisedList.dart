@@ -10,18 +10,27 @@ class comproList extends StatefulWidget {
 
 class _comproListState extends State<comproList> {
 
-  Compromised _Compromised = new Compromised();
+  final Compromised _Compromised = Compromised();
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: _Compromised.Title.length,
-      itemBuilder: (BuildContext context, int index) {
-        return ListTile(
-          title: Text(_Compromised.Title[index]),
-        );
-      },
+    return Center(
+        child: Card(
+          child: Container(
+            height: 500,
+            width: MediaQuery.of(context).size.width * 0.8,
+            color: Colors.white60,
+            child: ListView.builder(
+              itemCount: _Compromised.Title.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(_Compromised.Title[index]),
+                );
+              },
 
+            ),
+          ),
+        )
     );
   }
 }

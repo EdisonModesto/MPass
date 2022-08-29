@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:mpass/compromised.dart';
 import 'package:mpass/compromisedList.dart';
@@ -192,22 +193,52 @@ class _homePage extends State<Home>{
                             context: context,
                             builder: (BuildContext context){
                               return Center(
-                                child: Card(
-                                  child: Container(
-                                    height: 500,
-                                    width: MediaQuery.of(context).size.width * 0.8,
-                                    color: Colors.white60,
-                                    child: ListView.builder(
-                                      itemCount: _Compromised.Title.length,
-                                      itemBuilder: (BuildContext context, int index) {
-                                        return ListTile(
-                                          title: Text(_Compromised.Title[index]),
-                                        );
-                                      },
-
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(15))
                                     ),
-                                  ),
-                                )
+                                    child: Container(
+                                      height: 500,
+                                      width: MediaQuery.of(context).size.width * 0.8,
+                                      padding: const EdgeInsets.only(top: 20, bottom: 10, right: 25, left: 25),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white60,
+                                        borderRadius: BorderRadius.all(Radius.circular(15))
+                                      ),
+                                      child: Column(
+                                         children: [
+                                           const Text(
+                                             "Compromised Accounts",
+                                             style: TextStyle(
+                                               color: Colors.redAccent,
+                                               fontWeight: FontWeight.bold,
+                                               fontSize: 18,
+                                             ),
+                                           ),
+                                           Container(
+                                             child: ListView.builder(
+                                               shrinkWrap: true,
+                                               itemCount: _Compromised.Title.length,
+                                               itemBuilder: (BuildContext context, int index) {
+                                                 return ExpansionTile(
+                                                   leading: Icon(Icons.warning),
+                                                   title: Text(_Compromised.Title[index]),
+                                                   expandedAlignment: Alignment.centerLeft,
+                                                   expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                                                   children: [
+                                                     const AutoSizeText("The password of this account has been found on previously leaked databases. We suggest that you change your password ASAP.", maxLines: 3,),
+                                                     Text("\nEmail: ${_Compromised.Email[index]}", textAlign: TextAlign.start,),
+                                                     Text("Password: ${_Compromised.Password[index]}", textAlign: TextAlign.start,),
+                                                   ],
+
+                                                   );
+                                               },
+                                             ),
+                                           ),
+                                         ],
+                                      ),
+                                    ),
+                                  )
                               );
                             });
                       },
@@ -387,7 +418,8 @@ class _homePage extends State<Home>{
                                       itemCount: 4,
                                       scrollDirection: Axis.horizontal,
                                       itemBuilder: (BuildContext context, int index){
-                                        return Container(
+                                        return AnimatedContainer(
+                                          duration: Duration(milliseconds: 500),
                                           margin: const EdgeInsets.only(right: 10),
                                           child: OutlinedButton(
                                             onPressed: () => {
@@ -450,7 +482,7 @@ class _homePage extends State<Home>{
                                                 ),
                                                 child: Container(
                                                 padding: const EdgeInsets.only(top: 20, bottom: 10, right: 25, left: 25),
-                                                width: MediaQuery.of(context).size.width * 0.7,
+                                                width: MediaQuery.of(context).size.width * 0.8,
                                                 height: 230,
                                                 decoration: const BoxDecoration(
                                                   color: Color(0xffFFF9F9),
@@ -459,8 +491,9 @@ class _homePage extends State<Home>{
                                                 child: Column(
                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
-                                                    Text(
+                                                    AutoSizeText(
                                                       currentList[currIndex].Title[index],
+                                                      maxLines: 1,
                                                       style: const TextStyle(
                                                         fontWeight: FontWeight.bold,
                                                         fontSize: 20,
@@ -471,7 +504,7 @@ class _homePage extends State<Home>{
                                                       children: [
                                                         Icon(Icons.email),
                                                         Expanded(
-                                                            child: Text(" : " + currentList[currIndex].Email[index]),
+                                                            child: AutoSizeText(" : " + currentList[currIndex].Email[index], maxLines: 1,),
                                                         ),
                                                         IconButton(
                                                             onPressed: (){

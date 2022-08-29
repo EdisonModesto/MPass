@@ -3,4 +3,5 @@ class Compromised{
   late List<String> Email = [];
   late List<String> Password = [];
   late List<int> pointer = [];
+  late List<int> severity = [];
 }

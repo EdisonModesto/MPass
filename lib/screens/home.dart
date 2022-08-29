@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
@@ -128,6 +129,11 @@ class _homePage extends State<Home>{
 
     _checkBreached()async{
       var tempTotalCompro = 0;
+      _Compromised.Title.clear();
+      _Compromised.Email.clear();
+      _Compromised.Password.clear();
+      _Compromised.pointer.clear();
+      _Compromised.severity.clear();
 
       Timer(const Duration(seconds: 3), () async{
         for(int i = 0; i < _AccDetails.Title.length; i++) {
@@ -144,10 +150,13 @@ class _homePage extends State<Home>{
             //print(SplittedResponse[j] + " : " + remainHash+ "\n");
             if(SplittedResponse[j].contains(remainHash.toUpperCase())){
               tempTotalCompro +=1;
+              List<String> severety = SplittedResponse[j].split(":");
               _Compromised.Title.add(_AccDetails.Title[i]);
               _Compromised.Email.add(_AccDetails.Email[i]);
               _Compromised.Password.add(_AccDetails.Password[i]);
               _Compromised.pointer.add(i);
+
+              _Compromised.severity.add(int.parse(severety[1]));
             }
           }
         }
@@ -194,7 +203,7 @@ class _homePage extends State<Home>{
                             builder: (BuildContext context){
                               return Center(
                                   child: Card(
-                                    shape: RoundedRectangleBorder(
+                                    shape: const RoundedRectangleBorder(
                                       borderRadius: BorderRadius.all(Radius.circular(15))
                                     ),
                                     child: Container(
@@ -215,26 +224,143 @@ class _homePage extends State<Home>{
                                                fontSize: 18,
                                              ),
                                            ),
-                                           Container(
+                                           Expanded(
+                                             flex: 1,
                                              child: ListView.builder(
                                                shrinkWrap: true,
                                                itemCount: _Compromised.Title.length,
                                                itemBuilder: (BuildContext context, int index) {
-                                                 return ExpansionTile(
+                                                 return SingleChildScrollView(
+                                                   child: ExpansionTile(
+                                                     leading: Icon(Icons.warning),
+                                                     title: Text(_Compromised.Title[index]),
+                                                     expandedAlignment: Alignment.centerLeft,
+                                                     expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                                                     children: [
+                                                       const AutoSizeText("The password of this account has been found on previously leaked databases. We suggest that you change your password ASAP.", style: TextStyle(fontSize: 12)),
+                                                       Text("\nEmail: ${_Compromised.Email[index]}", textAlign: TextAlign.start, style: TextStyle(fontSize: 12),),
+                                                       Text("Password: ${_Compromised.Password[index]}", textAlign: TextAlign.start, style: TextStyle(fontSize: 12)),
+                                                       AutoSizeText("Password was previously leaked ${_Compromised.severity[index]} times.", style: TextStyle(color: Colors.redAccent, fontSize: 12),),
+                                                     ],
+
+                                                   ),
+                                                 );
+
+                                                   ExpansionTile(
                                                    leading: Icon(Icons.warning),
                                                    title: Text(_Compromised.Title[index]),
                                                    expandedAlignment: Alignment.centerLeft,
                                                    expandedCrossAxisAlignment: CrossAxisAlignment.start,
                                                    children: [
-                                                     const AutoSizeText("The password of this account has been found on previously leaked databases. We suggest that you change your password ASAP.", maxLines: 3,),
-                                                     Text("\nEmail: ${_Compromised.Email[index]}", textAlign: TextAlign.start,),
-                                                     Text("Password: ${_Compromised.Password[index]}", textAlign: TextAlign.start,),
+                                                     const AutoSizeText("The password of this account has been found on previously leaked databases. We suggest that you change your password ASAP.", maxLines: 3, minFontSize: 1,),
+                                                     Text("\nEmail: ${_Compromised.Email[index]}", textAlign: TextAlign.start, style: TextStyle(fontSize: 12),),
+                                                     Text("Password: ${_Compromised.Password[index]}", textAlign: TextAlign.start, style: TextStyle(fontSize: 12)),
+                                                     AutoSizeText("Password was previously leaked ${_Compromised.severity[index]} times.", style: TextStyle(color: Colors.redAccent, fontSize: 12),),
                                                    ],
 
                                                    );
                                                },
                                              ),
                                            ),
+                                           ElevatedButton(
+                                               onPressed: (){
+                                                 Navigator.pop(context);
+                                                 _fixPasswords();
+                                                 showDialog(barrierDismissible: false, context: context, builder: (BuildContext context){
+                                                   return Center(
+                                                     child: Card(
+                                                       shape: const RoundedRectangleBorder(
+                                                           borderRadius: BorderRadius.all(Radius.circular(15))
+                                                       ),
+                                                       child: Container(
+                                                         height: 500,
+                                                         width: MediaQuery.of(context).size.width * 0.8,
+                                                         padding: const EdgeInsets.only(top: 20, bottom: 10, right: 25, left: 25),
+                                                         decoration: const BoxDecoration(
+                                                             color: Colors.white60,
+                                                             borderRadius: BorderRadius.all(Radius.circular(15))
+                                                         ),
+                                                         child: Column(
+                                                           children: [
+                                                             const Text(
+                                                               "Accounts Fixed",
+                                                               style: TextStyle(
+                                                                 color: Color(0xff8269B8),
+                                                                 fontWeight: FontWeight.bold,
+                                                                 fontSize: 18,
+                                                               ),
+                                                             ),
+                                                             const Text("\nAll affected passwords have been replaced with strong passwords. You can copy the new passwords below and change them in their respective app settings.\n",textAlign: TextAlign.justify, style: TextStyle(color: Colors.black, fontSize: 11),),
+                                                             Expanded(
+                                                               flex: 1,
+                                                               child: ListView.builder(
+                                                                 itemCount: _Compromised.Title.length,
+                                                                   shrinkWrap: true,
+                                                                   itemBuilder: (BuildContext context,int index){
+                                                                 return ListTile(
+                                                                     contentPadding: const EdgeInsets.all(0),
+                                                                     leading: Container(
+                                                                       padding: const EdgeInsets.only(
+                                                                           top: 10, bottom: 10),
+                                                                       child: Image.asset(
+                                                                           "assets/images/fbIcon.png"),
+                                                                     ),
+
+                                                                     trailing: IconButton(
+                                                                       onPressed: () {
+                                                                         Clipboard.setData(ClipboardData(
+                                                                             text: _Compromised.Password[index]));
+                                                                         Fluttertoast.showToast(
+                                                                             msg: "Password Copied!");
+                                                                       },
+                                                                       icon: Image.asset(
+                                                                           "assets/images/copyicon.png"),
+                                                                       padding: const EdgeInsets.only(
+                                                                           top: 15, bottom: 15),
+                                                                     ),
+                                                                     title: Container(
+                                                                       padding: const EdgeInsets.only(
+                                                                           left: 10),
+                                                                       child: Column(
+                                                                         crossAxisAlignment: CrossAxisAlignment
+                                                                             .start,
+                                                                         mainAxisAlignment: MainAxisAlignment
+                                                                             .spaceEvenly,
+                                                                         children: [
+                                                                           Text(
+
+                                                                             _Compromised.Title[index],
+                                                                             style: const TextStyle(
+                                                                                 fontWeight: FontWeight.bold,
+                                                                               fontSize: 14
+                                                                             ),
+                                                                           ),
+                                                                           AutoSizeText(
+                                                                             _Compromised.Email[index],
+                                                                             //_Emails![index],
+                                                                             style: const TextStyle(fontSize: 12),
+                                                                             maxLines: 1,
+                                                                           )
+                                                                         ],
+                                                                       ),
+                                                                     )
+                                                                 );
+                                                               }),
+                                                             ),
+                                                             ElevatedButton(
+                                                                 onPressed: (){
+                                                                   Navigator.pop(context);
+                                                                   },
+                                                                 child: Text("Done")),
+                                                           ],
+                                                         ),
+                                                       ),
+                                                     ),
+                                                   );
+                                                 });
+                                               },
+                                               child: Text("Fix All"),
+                                           )
                                          ],
                                       ),
                                     ),
@@ -253,6 +379,22 @@ class _homePage extends State<Home>{
         print("Checking done");
       //print(SplittedResponse);
       });
+    }
+
+    _fixPasswords(){
+      String strCollection = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789!_&@123456789!_&@123456789!_&@123456789!_&@";
+      var rand = Random();
+
+      for(int i = 0; i < _Compromised.Title.length; i++){
+        String temp = "";
+        for(int j = 0; j < 8; j++){
+          temp += strCollection[rand.nextInt(104)];
+        }
+        _Compromised.Password[i] = temp;
+        _AccDetails.Password[_Compromised.pointer[i]] = temp;
+      }
+
+      _savePasswords();
     }
 
     _checkIdentical()async{

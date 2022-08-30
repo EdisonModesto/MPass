@@ -522,8 +522,9 @@ class _homePage extends State<Home>{
                                                     ),
                                                     width: MediaQuery.of(context).size.width * 0.8,
                                                     height: 50,
-                                                    child: Column(
+                                                    child:Column(
                                                       children: [
+
                                                         TextField(
                                                           onChanged: (value){
                                                             _searchPassword(value);
@@ -541,6 +542,7 @@ class _homePage extends State<Home>{
                                                         )
                                                       ],
                                                     )
+
                                                 ),
                                               )
                                             );
@@ -805,65 +807,89 @@ class _homePage extends State<Home>{
                                 final TextEditingController _emailCon = TextEditingController();
                                 final TextEditingController _passCon = TextEditingController();
                                 showDialog(context: context, builder: (_) =>
-                                  AlertDialog (
-                                    title: const Text(
-                                      "Add Account",
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                Center(
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(15))
                                     ),
-
-                                    actions: [
-                                      TextButton(
-                                          onPressed: (){
-                                            Navigator.pop(context, true);
-                                          },
-                                          child: const Text("Close"),
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width * 0.7,
+                                      height: 275,
+                                      padding: EdgeInsets.only(top: 20, bottom: 20, left: 40, right: 40),
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(Radius.circular(15))
                                       ),
-                                      TextButton(
-                                          onPressed: (){
-                                            _addPasswords(tempName,_emailCon.text,_passCon.text);
-                                            Navigator.pop(context, true);
-                                          },
-
-                                          child: const Text("Add")
-                                      ),
-                                    ],
-
-                                    content: Container(
-                                      width: MediaQuery.of(context).size.width * 1,
-                                      height: MediaQuery.of(context).size.height * 0.25,
                                       child: Column(
                                         children: [
-                                          TextField(
-                                            decoration: const InputDecoration(hintText: "App Name"),
-                                            onChanged: (val) {
-                                              setState((){
-                                                tempName = _titleCon.text;
-                                              });
-                                            },
-                                            controller: _titleCon,
+                                        Text("Add Account", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),),
+                                          Expanded(
+                                            flex: 1,
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                children: [
+
+                                                  TextField(
+                                                      decoration: const InputDecoration(hintText: "App Name"),
+                                                      style: TextStyle(fontSize: 12),
+                                                      onChanged: (val) {
+                                                        setState((){
+                                                          tempName = _titleCon.text;
+                                                        });
+                                                      },
+                                                      controller: _titleCon,
+                                                    ),
+                                                  TextField(
+                                                    decoration: const InputDecoration(hintText: "Email"),
+                                                    onChanged: (val2){
+                                                      setState((){
+                                                        tempMail = _emailCon.text;
+                                                      });
+                                                    },
+                                                    style: TextStyle(fontSize: 12),
+                                                    controller: _emailCon,
+                                                    autofillHints: [AutofillHints.email],
+                                                  ),
+                                                  TextField(
+                                                    decoration: const InputDecoration(hintText: "Password"),
+                                                    onChanged: (val3){
+                                                      setState((){
+                                                        tempPass = _passCon.text;
+                                                      });
+                                                    },
+                                                    style: TextStyle(fontSize: 12),
+                                                    controller: _passCon,
+                                                    autofillHints: [AutofillHints.password],
+                                                    onEditingComplete: () => TextInput.finishAutofillContext(),
+                                                  ),
+                                                ],
+                                              )
                                           ),
-                                          TextField(
-                                            decoration: const InputDecoration(hintText: "Email"),
-                                            onChanged: (val2){
-                                              setState((){
-                                                tempMail = _emailCon.text;
-                                              });
-                                            },
-                                            controller: _emailCon,
-                                          ),
-                                          TextField(
-                                            decoration: const InputDecoration(hintText: "Password"),
-                                            onChanged: (val3){
-                                              setState((){
-                                                tempPass = _passCon.text;
-                                              });
-                                            },
-                                            controller: _passCon,
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            children: [
+                                              TextButton(
+                                                onPressed: (){
+                                                  Navigator.pop(context, true);
+                                                },
+                                                child: const Text("Close"),
+                                              ),
+                                              TextButton(
+                                                  onPressed: (){
+                                                    _addPasswords(tempName,_emailCon.text,_passCon.text);
+                                                    Navigator.pop(context, true);
+                                                  },
+
+                                                  child: const Text("Add")
+                                              ),
+                                            ],
                                           )
                                         ],
                                       ),
                                     ),
                                   ),
+                                ),
+
                                 );
                               },
                               child: const Text("Add Account"),

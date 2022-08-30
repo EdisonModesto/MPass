@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
+import 'package:webviewx/webviewx.dart';
 
 class Settings extends StatefulWidget{
   @override
@@ -9,7 +10,8 @@ class Settings extends StatefulWidget{
 
 class _settings extends State<Settings>{
 
-  List<String> settingsLbl = ["Scan Settings", "Backup Settings", "Appearance", "Privacy and Policy"];
+  List<String> settingsLbl = [ "Appearance", "Categories", "Scan Settings", "Backup Settings","Privacy and Policy"];
+  late WebViewXController webviewController;
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +131,29 @@ class _settings extends State<Settings>{
                               child: Center(
                                   child: TextButton(
 
-                                    onPressed: () {  },
+                                    onPressed: () {
+                                      showDialog(context: context, builder: (BuildContext context){
+                                        return Center(
+                                          child: Card(
+                                            shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(15))
+                                            ),
+                                            child: Container(
+                                              height: 500,
+                                              width: MediaQuery.of(context).size.width * 0.8,
+                                              decoration: const BoxDecoration(
+                                                  borderRadius: BorderRadius.all(Radius.circular(15))
+                                              ),
+                                              child: WebViewX(
+                                                initialContent: "https://ko-fi.com/edisonmodesto",
+                                                width: MediaQuery.of(context).size.width * 1,
+                                                height: MediaQuery.of(context).size.height * 1,
+                                              ),
+                                            ),
+                                          ) ,
+                                        );
+                                      });
+                                    },
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [

@@ -813,15 +813,15 @@ class _homePage extends State<Home>{
                                       borderRadius: BorderRadius.all(Radius.circular(15))
                                     ),
                                     child: Container(
-                                      width: MediaQuery.of(context).size.width * 0.7,
+                                      width: MediaQuery.of(context).size.width * 0.8,
                                       height: 275,
-                                      padding: EdgeInsets.only(top: 20, bottom: 20, left: 40, right: 40),
+                                      padding: EdgeInsets.only(top: 20, bottom: 20, left: 30, right: 30),
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.all(Radius.circular(15))
                                       ),
                                       child: Column(
                                         children: [
-                                        Text("Add Account", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),),
+                                        Text("Add Account", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),),
                                           Expanded(
                                             flex: 1,
                                               child: Column(
@@ -830,7 +830,7 @@ class _homePage extends State<Home>{
 
                                                   TextField(
                                                       decoration: const InputDecoration(hintText: "App Name"),
-                                                      style: TextStyle(fontSize: 12),
+                                                      style: TextStyle(fontSize: 14),
                                                       onChanged: (val) {
                                                         setState((){
                                                           tempName = _titleCon.text;
@@ -845,7 +845,7 @@ class _homePage extends State<Home>{
                                                         tempMail = _emailCon.text;
                                                       });
                                                     },
-                                                    style: TextStyle(fontSize: 12),
+                                                    style: TextStyle(fontSize: 14),
                                                     controller: _emailCon,
                                                     autofillHints: [AutofillHints.email],
                                                   ),
@@ -856,7 +856,7 @@ class _homePage extends State<Home>{
                                                         tempPass = _passCon.text;
                                                       });
                                                     },
-                                                    style: TextStyle(fontSize: 12),
+                                                    style: TextStyle(fontSize: 14),
                                                     controller: _passCon,
                                                     autofillHints: [AutofillHints.password],
                                                     onEditingComplete: () => TextInput.finishAutofillContext(),

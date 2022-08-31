@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:slider_button/slider_button.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class Settings extends StatefulWidget{
@@ -13,6 +17,28 @@ class Settings extends StatefulWidget{
 class _settings extends State<Settings>{
 
   List<String> settingsLbl = [ "Appearance", "Categories", "Scan Settings", "Backup Settings","Privacy and Policy"];
+  
+  bool scanMode = false;
+  
+  _setScanMode(value)async{
+    final scanPref = await SharedPreferences.getInstance();
+    await scanPref.setBool("isScan", value);
+    _getScanMode();
+
+  }
+  
+  _getScanMode() async{
+    final scanPref = await SharedPreferences.getInstance();
+    setState((){
+      scanMode = scanPref.getBool("isScan")!;
+    });
+  }
+  
+  @override
+  void initState() {
+    _getScanMode();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,24 +51,22 @@ class _settings extends State<Settings>{
               //Top Part
               Expanded(
                 flex: 30,
-                child: Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      FadeIn(
-                        curve: Curves.easeIn,
-                        duration: Duration(milliseconds: 600),
-                        child: Text(
-                          "Settings",
-                          style: TextStyle(
-                              color: Color(0xffFFF9F9),
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold
-                          ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    FadeIn(
+                      curve: Curves.easeIn,
+                      duration: Duration(milliseconds: 600),
+                      child: Text(
+                        "Settings",
+                        style: TextStyle(
+                            color: Color(0xffFFF9F9),
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold
                         ),
-                      )
-                    ],
-                  ),
+                      ),
+                    )
+                  ],
                 ),
               ),
 
@@ -74,36 +98,137 @@ class _settings extends State<Settings>{
                     children: [
                       Expanded(
                         flex: 100,
-                          child: ListView.builder(
-                          itemCount: settingsLbl.length,
-                          itemBuilder: (BuildContext context, int index){
-                            return Container(
+                          child: ListView(
+                            children: [
+                              SizedBox(
                               width: MediaQuery.of(context).size.width * 1,
                               height: 50,
                               child: TextButton(
                                 onPressed: () {  },
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      settingsLbl[index],
-                                      style: const TextStyle(
-                                        color: Color(0xff000000),
-                                        fontSize: 16,
-                                      ),
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                        Text(
+                                          settingsLbl[0],
+                                          style: const TextStyle(
+                                            color: Color(0xff000000),
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        const Text(
+                                          ">",
+                                          style: TextStyle(
+                                            color: Color(0xffB3B3B3),
+                                            fontSize: 25,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const Text(
-                                      ">",
-                                      style: TextStyle(
-                                        color: Color(0xffB3B3B3),
-                                        fontSize: 25,
-                                      ),
+                                  )
+                              ),
+                              SizedBox(
+                                  width: MediaQuery.of(context).size.width * 1,
+                                  height: 50,
+                                  child: TextButton(
+                                    onPressed: () {  },
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          settingsLbl[1],
+                                          style: const TextStyle(
+                                            color: Color(0xff000000),
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        const Text(
+                                          ">",
+                                          style: TextStyle(
+                                            color: Color(0xffB3B3B3),
+                                            fontSize: 25,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              )
-                            );
-                          })
+                                  )
+                              ),
+                              SizedBox(
+                                  width: MediaQuery.of(context).size.width * 1,
+                                  height: 50,
+                                  child: TextButton(
+                                    onPressed: () {  },
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          settingsLbl[2],
+                                          style: const TextStyle(
+                                            color: Color(0xff000000),
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Switch(value: scanMode, onChanged: (bool value){
+                                          _setScanMode(value);
+                                          Fluttertoast.showToast(msg: "Scanning ${scanMode ? "disabled" : "enabled"}");
+                                        })
+                                      ],
+                                    ),
+                                  )
+                              ),
+                              SizedBox(
+                                  width: MediaQuery.of(context).size.width * 1,
+                                  height: 50,
+                                  child: TextButton(
+                                    onPressed: () {  },
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          settingsLbl[3],
+                                          style: const TextStyle(
+                                            color: Color(0xff000000),
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        const Text(
+                                          ">",
+                                          style: TextStyle(
+                                            color: Color(0xffB3B3B3),
+                                            fontSize: 25,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                              ),
+                              SizedBox(
+                                  width: MediaQuery.of(context).size.width * 1,
+                                  height: 50,
+                                  child: TextButton(
+                                    onPressed: () {  },
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          settingsLbl[4],
+                                          style: const TextStyle(
+                                            color: Color(0xff000000),
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        const Text(
+                                          ">",
+                                          style: TextStyle(
+                                            color: Color(0xffB3B3B3),
+                                            fontSize: 25,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                              ),
+                            ],
+                          )
                       ),
                     ],
                   ),
@@ -115,19 +240,19 @@ class _settings extends State<Settings>{
             children: [
               Expanded(
                 flex: 36,
-                child: Container(
+                child: SizedBox(
 
                   width: MediaQuery.of(context).size.width * .85,
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: Card(
-                      color: Color(0xffFFF9F9),
-                      child: Container(
+                      color: const Color(0xffFFF9F9),
+                      child: SizedBox(
                         height: MediaQuery.of(context).size.height * .1,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Container(
+                            SizedBox(
                               width: MediaQuery.of(context).size.width * 0.40,
                               child: Center(
                                   child: TextButton(
@@ -139,15 +264,15 @@ class _settings extends State<Settings>{
                                             shape: const RoundedRectangleBorder(
                                               borderRadius: BorderRadius.all(Radius.circular(15))
                                             ),
-                                            child: Container(
+                                            child: SizedBox(
                                               height: 500,
                                               width: MediaQuery.of(context).size.width * 0.8,
-                                              decoration: const BoxDecoration(
-                                                  borderRadius: BorderRadius.all(Radius.circular(15))
-                                              ),
-                                              child: const WebView(
-                                                initialUrl: "https://ko-fi.com/edisonmodesto",
-                                                javascriptMode: JavascriptMode.unrestricted,
+                                              child: const ClipRRect(
+                                                borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                child: WebView(
+                                                  initialUrl: "https://ko-fi.com/edisonmodesto",
+                                                  javascriptMode: JavascriptMode.unrestricted,
+                                                ),
                                               ),
                                             ),
                                           ) ,
@@ -175,14 +300,14 @@ class _settings extends State<Settings>{
                               ),
                             ),
                             Container(
-                              margin: EdgeInsets.only(top: 15, bottom: 15),
+                              margin: const EdgeInsets.only(top: 15, bottom: 15),
                               width: MediaQuery.of(context).size.width * 0.01,
                               decoration: BoxDecoration(
-                                  color: Color(0xffBAABDA),
+                                  color: const Color(0xffBAABDA),
                                   borderRadius: BorderRadius.circular(15)
                               ),
                             ),
-                            Container(
+                            SizedBox(
                               width: MediaQuery.of(context).size.width * 0.40,
                               child: Center(
                                   child: TextButton(

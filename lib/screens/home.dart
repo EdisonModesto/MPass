@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
-
-import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:mpass/compromised.dart';
-import 'package:mpass/compromisedList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/services.dart';
@@ -30,27 +27,28 @@ class Home extends StatefulWidget{
 class _homePage extends State<Home>{
 
   //categories Button and states
-  List<String> _category = ["All", "Most Used", "Social", "Work"];
-  List _catSelected = [true, false, false, false];
+  final List<String> _category = ["All", "Most Used", "Social", "Work"];
+  final List _catSelected = [true, false, false, false];
 
   final PasswordPref = SharedPreferences.getInstance();
 
   //passwords
-  accDetails _AccDetails = new accDetails();
-  Compromised _Compromised = new Compromised();
+  final accDetails _AccDetails = new accDetails();
+  final Compromised _Compromised = new Compromised();
 
   //category lists
-  searchList _searchList = new searchList();
-  mostUsed _mostUsed = new mostUsed();
-  social _social = new social();
-  work _work = new work();
+  final searchList _searchList = new searchList();
+  final mostUsed _mostUsed = new mostUsed();
+  final social _social = new social();
+  final work _work = new work();
 
   int compromised = 0;
   int _identical = 0;
 
   List currentList = [];
   int currIndex = 0;
-  
+
+
   _searchPassword(String value) async{
 
     _searchList.Title.clear();
@@ -91,11 +89,11 @@ class _homePage extends State<Home>{
         _AccDetails.Email = PasswordPref.getStringList('Emails')!;
         _AccDetails.Password = PasswordPref.getStringList('Passwords')!;
       });
-      print("Loaded" + _AccDetails.Title.toString() + ", " + _AccDetails.Email.toString()+ ","+ _AccDetails.Password.toString());
+
+      print("Loaded${_AccDetails.Title}, ${_AccDetails.Email},${_AccDetails.Password}");
     }
 
     _addPasswords(tempName, tempMail, tempPass){
-
 
           setState(() {
             _AccDetails.Title.add(tempName);
@@ -104,16 +102,15 @@ class _homePage extends State<Home>{
 
           setState((){
             _AccDetails.Email.add(tempMail);
-            print(_AccDetails.Email);
           });
 
           setState((){
             _AccDetails.Password.add(tempPass);
-            print(_AccDetails.Password);
           });
 
       _savePasswords();
       _checkBreached();
+      _checkIdentical();
     }
 
     _savePasswords() async{
@@ -126,259 +123,391 @@ class _homePage extends State<Home>{
     await PasswordPref.setStringList('Passwords', _AccDetails.Password);
   }
 
-
     _checkBreached()async{
-      var tempTotalCompro = 0;
-      _Compromised.Title.clear();
-      _Compromised.Email.clear();
-      _Compromised.Password.clear();
-      _Compromised.pointer.clear();
-      _Compromised.severity.clear();
+    final PasswordPref = await SharedPreferences.getInstance();
+    if(PasswordPref.getBool("isScan")!) {
+        var tempTotalCompro = 0;
+        _Compromised.Title.clear();
+        _Compromised.Email.clear();
+        _Compromised.Password.clear();
+        _Compromised.pointer.clear();
+        _Compromised.severity.clear();
 
-      Timer(const Duration(seconds: 3), () async{
-        for(int i = 0; i < _AccDetails.Title.length; i++) {
-          var hashedPass = sha1.convert(utf8.encode(_AccDetails.Password[i])).toString();
-          print(hashedPass);
-          print(hashedPass.substring(5, hashedPass.length));
-          var trimHash = hashedPass.substring(0, 5);
-          var remainHash = hashedPass.substring(5, hashedPass.length);
-          Response response = await get(Uri.parse("https://api.pwnedpasswords.com/range/$trimHash"));
-          LineSplitter splt = const LineSplitter();
-          List<String> SplittedResponse = splt.convert(response.body);
-          //print(SplittedResponse);
-          for(int j = 0; j < SplittedResponse.length; j++){
-            //print(SplittedResponse[j] + " : " + remainHash+ "\n");
-            if(SplittedResponse[j].contains(remainHash.toUpperCase())){
-              tempTotalCompro +=1;
-              List<String> severety = SplittedResponse[j].split(":");
-              _Compromised.Title.add(_AccDetails.Title[i]);
-              _Compromised.Email.add(_AccDetails.Email[i]);
-              _Compromised.Password.add(_AccDetails.Password[i]);
-              _Compromised.pointer.add(i);
+        Timer(const Duration(seconds: 3), () async {
+          for (int i = 0; i < _AccDetails.Title.length; i++) {
+            var hashedPass = sha1.convert(utf8.encode(_AccDetails.Password[i]))
+                .toString();
+            print(hashedPass);
+            print(hashedPass.substring(5, hashedPass.length));
+            var trimHash = hashedPass.substring(0, 5);
+            var remainHash = hashedPass.substring(5, hashedPass.length);
+            Response response = await get(
+                Uri.parse("https://api.pwnedpasswords.com/range/$trimHash"));
+            LineSplitter splt = const LineSplitter();
+            List<String> SplittedResponse = splt.convert(response.body);
+            //print(SplittedResponse);
+            for (int j = 0; j < SplittedResponse.length; j++) {
+              //print(SplittedResponse[j] + " : " + remainHash+ "\n");
+              if (SplittedResponse[j].contains(remainHash.toUpperCase())) {
+                tempTotalCompro += 1;
+                List<String> severety = SplittedResponse[j].split(":");
+                _Compromised.Title.add(_AccDetails.Title[i]);
+                _Compromised.Email.add(_AccDetails.Email[i]);
+                _Compromised.Password.add(_AccDetails.Password[i]);
+                _Compromised.pointer.add(i);
 
-              _Compromised.severity.add(int.parse(severety[1]));
+                _Compromised.severity.add(int.parse(severety[1]));
+              }
             }
           }
-        }
-        setState((){
-          compromised = tempTotalCompro;
-        });
+          setState(() {
+            compromised = tempTotalCompro;
+          });
 
-        if(compromised != 0){
-          showBottomSheet(context: context, builder: (BuildContext context){
-            return Container(
-              color: Colors.redAccent,
-              height: 200,
-              width: MediaQuery.of(context).size.width * 1,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.warning,
-                    color: Colors.white,
-                    size: 40,
-                  ),
-                  const Text(
-                    "Compromised Passwords\nFound",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-
-                    ),
-                  ),
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(
+          if (compromised != 0) {
+            showBottomSheet(context: context, builder: (BuildContext context) {
+              return Container(
+                  color: Colors.redAccent,
+                  height: 200,
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width * 1,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.warning,
                         color: Colors.white,
-                        width: 1.5
+                        size: 40,
+                      ),
+                      const Text(
+                        "Compromised Passwords\nFound",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+
+                        ),
+                      ),
+                      OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                              side: const BorderSide(
+                                  color: Colors.white,
+                                  width: 1.5
+                              )
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Center(
+                                      child: Card(
+                                        shape: const RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(15))
+                                        ),
+                                        child: Container(
+                                          height: 500,
+                                          width: MediaQuery
+                                              .of(context)
+                                              .size
+                                              .width * 0.8,
+                                          padding: const EdgeInsets.only(top: 20,
+                                              bottom: 10,
+                                              right: 25,
+                                              left: 25),
+                                          decoration: const BoxDecoration(
+                                              color: Colors.white60,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(15))
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              const Text(
+                                                "Compromised Accounts",
+                                                style: TextStyle(
+                                                  color: Colors.redAccent,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: ListView.builder(
+                                                  shrinkWrap: true,
+                                                  itemCount: _Compromised.Title
+                                                      .length,
+                                                  itemBuilder: (
+                                                      BuildContext context,
+                                                      int index) {
+                                                    return SingleChildScrollView(
+                                                      child: ExpansionTile(
+                                                        leading: const Icon(
+                                                            Icons.warning),
+                                                        title: Text(_Compromised
+                                                            .Title[index]),
+                                                        expandedAlignment: Alignment
+                                                            .centerLeft,
+                                                        expandedCrossAxisAlignment: CrossAxisAlignment
+                                                            .start,
+                                                        children: [
+                                                          const AutoSizeText(
+                                                              "The password of this account has been found on previously leaked databases. We suggest that you change your password ASAP.",
+                                                              style: TextStyle(
+                                                                  fontSize: 12)),
+                                                          Text(
+                                                            "\nEmail: ${_Compromised
+                                                                .Email[index]}",
+                                                            textAlign: TextAlign
+                                                                .start,
+                                                            style: const TextStyle(
+                                                                fontSize: 12),),
+                                                          Text(
+                                                              "Password: ${_Compromised
+                                                                  .Password[index]}",
+                                                              textAlign: TextAlign
+                                                                  .start,
+                                                              style: const TextStyle(
+                                                                  fontSize: 12)),
+                                                          AutoSizeText(
+                                                            "Password was previously leaked ${_Compromised
+                                                                .severity[index]} times.",
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .redAccent,
+                                                                fontSize: 12),),
+                                                        ],
+
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                  _fixPasswords();
+                                                  showDialog(
+                                                      barrierDismissible: false,
+                                                      context: context,
+                                                      builder: (
+                                                          BuildContext context) {
+                                                        return Center(
+                                                          child: Card(
+                                                            shape: const RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                    .circular(15))
+                                                            ),
+                                                            child: Container(
+                                                              height: 500,
+                                                              width: MediaQuery
+                                                                  .of(context)
+                                                                  .size
+                                                                  .width * 0.8,
+                                                              padding: const EdgeInsets
+                                                                  .only(top: 20,
+                                                                  bottom: 10,
+                                                                  right: 25,
+                                                                  left: 25),
+                                                              decoration: const BoxDecoration(
+                                                                  color: Colors
+                                                                      .white60,
+                                                                  borderRadius: BorderRadius
+                                                                      .all(Radius
+                                                                      .circular(
+                                                                      15))
+                                                              ),
+                                                              child: Column(
+                                                                children: [
+                                                                  const Text(
+                                                                    "Accounts Fixed",
+                                                                    style: TextStyle(
+                                                                      color: Color(
+                                                                          0xff8269B8),
+                                                                      fontWeight: FontWeight
+                                                                          .bold,
+                                                                      fontSize: 18,
+                                                                    ),
+                                                                  ),
+                                                                  const Text(
+                                                                    "\nAll affected passwords have been replaced with strong passwords. You can copy the new passwords below and change them in their respective app settings.\n",
+                                                                    textAlign: TextAlign
+                                                                        .justify,
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize: 11),),
+                                                                  Expanded(
+                                                                    flex: 1,
+                                                                    child: ListView
+                                                                        .builder(
+                                                                        itemCount: _Compromised
+                                                                            .Title
+                                                                            .length,
+                                                                        shrinkWrap: true,
+                                                                        itemBuilder: (
+                                                                            BuildContext context,
+                                                                            int index) {
+                                                                          return ListTile(
+                                                                              onTap: () {
+                                                                                showDialog(
+                                                                                    context: context,
+                                                                                    builder: (
+                                                                                        BuildContext context) {
+                                                                                      return Center(
+                                                                                        child: Card(
+                                                                                          shape: const RoundedRectangleBorder(
+                                                                                              borderRadius: BorderRadius
+                                                                                                  .all(
+                                                                                                  Radius
+                                                                                                      .circular(
+                                                                                                      15))
+                                                                                          ),
+                                                                                          child: Container(
+                                                                                            width: MediaQuery
+                                                                                                .of(
+                                                                                                context)
+                                                                                                .size
+                                                                                                .width *
+                                                                                                0.7,
+                                                                                            height: 100,
+                                                                                            padding: const EdgeInsets
+                                                                                                .only(
+                                                                                                top: 20,
+                                                                                                bottom: 20,
+                                                                                                right: 25,
+                                                                                                left: 25),
+                                                                                            decoration: const BoxDecoration(
+                                                                                                borderRadius: BorderRadius
+                                                                                                    .all(
+                                                                                                    Radius
+                                                                                                        .circular(
+                                                                                                        15))
+                                                                                            ),
+                                                                                            child: Column(
+                                                                                              mainAxisAlignment: MainAxisAlignment
+                                                                                                  .spaceBetween,
+                                                                                              children: [
+                                                                                                const Text(
+                                                                                                    "Password:"),
+                                                                                                Text(
+                                                                                                    _Compromised
+                                                                                                        .Password[index]),
+                                                                                              ],
+                                                                                            ),
+                                                                                          ),
+                                                                                        ),
+                                                                                      );
+                                                                                    });
+                                                                              },
+                                                                              contentPadding: const EdgeInsets
+                                                                                  .all(
+                                                                                  0),
+                                                                              leading: Container(
+                                                                                padding: const EdgeInsets
+                                                                                    .only(
+                                                                                    top: 10,
+                                                                                    bottom: 10),
+                                                                                child: Image
+                                                                                    .asset(
+                                                                                    "assets/images/fbIcon.png"),
+                                                                              ),
+
+                                                                              trailing: IconButton(
+                                                                                onPressed: () {
+                                                                                  Clipboard
+                                                                                      .setData(
+                                                                                      ClipboardData(
+                                                                                          text: _Compromised
+                                                                                              .Password[index]));
+                                                                                  Fluttertoast
+                                                                                      .showToast(
+                                                                                      msg: "Password Copied!");
+                                                                                },
+                                                                                icon: Image
+                                                                                    .asset(
+                                                                                    "assets/images/copyicon.png"),
+                                                                                padding: const EdgeInsets
+                                                                                    .only(
+                                                                                    top: 15,
+                                                                                    bottom: 15),
+                                                                              ),
+                                                                              title: Container(
+                                                                                padding: const EdgeInsets
+                                                                                    .only(
+                                                                                    left: 10),
+                                                                                child: Column(
+                                                                                  crossAxisAlignment: CrossAxisAlignment
+                                                                                      .start,
+                                                                                  mainAxisAlignment: MainAxisAlignment
+                                                                                      .spaceEvenly,
+                                                                                  children: [
+                                                                                    Text(
+
+                                                                                      _Compromised
+                                                                                          .Title[index],
+                                                                                      style: const TextStyle(
+                                                                                          fontWeight: FontWeight
+                                                                                              .bold,
+                                                                                          fontSize: 14
+                                                                                      ),
+                                                                                    ),
+                                                                                    AutoSizeText(
+                                                                                      _Compromised
+                                                                                          .Email[index],
+                                                                                      //_Emails![index],
+                                                                                      style: const TextStyle(
+                                                                                          fontSize: 12),
+                                                                                      maxLines: 1,
+                                                                                    )
+                                                                                  ],
+                                                                                ),
+                                                                              )
+                                                                          );
+                                                                        }),
+                                                                  ),
+                                                                  ElevatedButton(
+                                                                      onPressed: () {
+                                                                        Navigator
+                                                                            .pop(
+                                                                            context);
+                                                                      },
+                                                                      child: const Text(
+                                                                          "Done")),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      });
+                                                },
+                                                child: const Text("Fix All"),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                  );
+                                });
+                          },
+                          child: const Text("Show Compromised Passwords",
+                            style: TextStyle(color: Colors.white),)
                       )
-                    ),
-                      onPressed: (){
-                        Navigator.pop(context);
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context){
-                              return Center(
-                                  child: Card(
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(Radius.circular(15))
-                                    ),
-                                    child: Container(
-                                      height: 500,
-                                      width: MediaQuery.of(context).size.width * 0.8,
-                                      padding: const EdgeInsets.only(top: 20, bottom: 10, right: 25, left: 25),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white60,
-                                        borderRadius: BorderRadius.all(Radius.circular(15))
-                                      ),
-                                      child: Column(
-                                         children: [
-                                           const Text(
-                                             "Compromised Accounts",
-                                             style: TextStyle(
-                                               color: Colors.redAccent,
-                                               fontWeight: FontWeight.bold,
-                                               fontSize: 18,
-                                             ),
-                                           ),
-                                           Expanded(
-                                             flex: 1,
-                                             child: ListView.builder(
-                                               shrinkWrap: true,
-                                               itemCount: _Compromised.Title.length,
-                                               itemBuilder: (BuildContext context, int index) {
-                                                 return SingleChildScrollView(
-                                                   child: ExpansionTile(
-                                                     leading: Icon(Icons.warning),
-                                                     title: Text(_Compromised.Title[index]),
-                                                     expandedAlignment: Alignment.centerLeft,
-                                                     expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                                                     children: [
-                                                       const AutoSizeText("The password of this account has been found on previously leaked databases. We suggest that you change your password ASAP.", style: TextStyle(fontSize: 12)),
-                                                       Text("\nEmail: ${_Compromised.Email[index]}", textAlign: TextAlign.start, style: TextStyle(fontSize: 12),),
-                                                       Text("Password: ${_Compromised.Password[index]}", textAlign: TextAlign.start, style: TextStyle(fontSize: 12)),
-                                                       AutoSizeText("Password was previously leaked ${_Compromised.severity[index]} times.", style: TextStyle(color: Colors.redAccent, fontSize: 12),),
-                                                     ],
-
-                                                   ),
-                                                 );
-
-                                                   ExpansionTile(
-                                                   leading: Icon(Icons.warning),
-                                                   title: Text(_Compromised.Title[index]),
-                                                   expandedAlignment: Alignment.centerLeft,
-                                                   expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                                                   children: [
-                                                     const AutoSizeText("The password of this account has been found on previously leaked databases. We suggest that you change your password ASAP.", maxLines: 3, minFontSize: 1,),
-                                                     Text("\nEmail: ${_Compromised.Email[index]}", textAlign: TextAlign.start, style: TextStyle(fontSize: 12),),
-                                                     Text("Password: ${_Compromised.Password[index]}", textAlign: TextAlign.start, style: TextStyle(fontSize: 12)),
-                                                     AutoSizeText("Password was previously leaked ${_Compromised.severity[index]} times.", style: TextStyle(color: Colors.redAccent, fontSize: 12),),
-                                                   ],
-
-                                                   );
-                                               },
-                                             ),
-                                           ),
-                                           ElevatedButton(
-                                               onPressed: (){
-                                                 Navigator.pop(context);
-                                                 _fixPasswords();
-                                                 showDialog(barrierDismissible: false, context: context, builder: (BuildContext context){
-                                                   return Center(
-                                                     child: Card(
-                                                       shape: const RoundedRectangleBorder(
-                                                           borderRadius: BorderRadius.all(Radius.circular(15))
-                                                       ),
-                                                       child: Container(
-                                                         height: 500,
-                                                         width: MediaQuery.of(context).size.width * 0.8,
-                                                         padding: const EdgeInsets.only(top: 20, bottom: 10, right: 25, left: 25),
-                                                         decoration: const BoxDecoration(
-                                                             color: Colors.white60,
-                                                             borderRadius: BorderRadius.all(Radius.circular(15))
-                                                         ),
-                                                         child: Column(
-                                                           children: [
-                                                             const Text(
-                                                               "Accounts Fixed",
-                                                               style: TextStyle(
-                                                                 color: Color(0xff8269B8),
-                                                                 fontWeight: FontWeight.bold,
-                                                                 fontSize: 18,
-                                                               ),
-                                                             ),
-                                                             const Text("\nAll affected passwords have been replaced with strong passwords. You can copy the new passwords below and change them in their respective app settings.\n",textAlign: TextAlign.justify, style: TextStyle(color: Colors.black, fontSize: 11),),
-                                                             Expanded(
-                                                               flex: 1,
-                                                               child: ListView.builder(
-                                                                 itemCount: _Compromised.Title.length,
-                                                                   shrinkWrap: true,
-                                                                   itemBuilder: (BuildContext context,int index){
-                                                                 return ListTile(
-                                                                     contentPadding: const EdgeInsets.all(0),
-                                                                     leading: Container(
-                                                                       padding: const EdgeInsets.only(
-                                                                           top: 10, bottom: 10),
-                                                                       child: Image.asset(
-                                                                           "assets/images/fbIcon.png"),
-                                                                     ),
-
-                                                                     trailing: IconButton(
-                                                                       onPressed: () {
-                                                                         Clipboard.setData(ClipboardData(
-                                                                             text: _Compromised.Password[index]));
-                                                                         Fluttertoast.showToast(
-                                                                             msg: "Password Copied!");
-                                                                       },
-                                                                       icon: Image.asset(
-                                                                           "assets/images/copyicon.png"),
-                                                                       padding: const EdgeInsets.only(
-                                                                           top: 15, bottom: 15),
-                                                                     ),
-                                                                     title: Container(
-                                                                       padding: const EdgeInsets.only(
-                                                                           left: 10),
-                                                                       child: Column(
-                                                                         crossAxisAlignment: CrossAxisAlignment
-                                                                             .start,
-                                                                         mainAxisAlignment: MainAxisAlignment
-                                                                             .spaceEvenly,
-                                                                         children: [
-                                                                           Text(
-
-                                                                             _Compromised.Title[index],
-                                                                             style: const TextStyle(
-                                                                                 fontWeight: FontWeight.bold,
-                                                                               fontSize: 14
-                                                                             ),
-                                                                           ),
-                                                                           AutoSizeText(
-                                                                             _Compromised.Email[index],
-                                                                             //_Emails![index],
-                                                                             style: const TextStyle(fontSize: 12),
-                                                                             maxLines: 1,
-                                                                           )
-                                                                         ],
-                                                                       ),
-                                                                     )
-                                                                 );
-                                                               }),
-                                                             ),
-                                                             ElevatedButton(
-                                                                 onPressed: (){
-                                                                   Navigator.pop(context);
-                                                                   },
-                                                                 child: Text("Done")),
-                                                           ],
-                                                         ),
-                                                       ),
-                                                     ),
-                                                   );
-                                                 });
-                                               },
-                                               child: Text("Fix All"),
-                                           )
-                                         ],
-                                      ),
-                                    ),
-                                  )
-                              );
-                            });
-                      },
-                      child: const Text("Show Compromised Passwords", style: TextStyle(color: Colors.white),)
+                    ],
                   )
-                ],
-              )
+              );
+            },
             );
-          },
-          );
-        }
-        print("Checking done");
-      //print(SplittedResponse);
-      });
+          }
+          print("Checking done");
+          //print(SplittedResponse);
+        });
+      }
     }
 
     _fixPasswords(){
@@ -398,12 +527,22 @@ class _homePage extends State<Home>{
     }
 
     _checkIdentical()async{
-      
+
+      Timer(const Duration(seconds: 1), () async{
+        List<String> temp = _AccDetails.Password;
+        var removedDupes = temp.toSet().toList();
+
+        setState((){
+          _identical = temp.length - removedDupes.length;
+        });
+
+      });
     }
 
   @override
   void initState() {
     _getPasswords();
+    _checkIdentical();
     _checkBreached();
     currentList = [_AccDetails,_mostUsed,_social,_work, _searchList,];
     super.initState();
@@ -421,39 +560,37 @@ class _homePage extends State<Home>{
               //Top Part
               Expanded(
                 flex: 30,
-                child: Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                        FadeIn(
-                          curve: Curves.easeIn,
-                          duration: const Duration(milliseconds: 600),
-                          child: Text(
-                            compromised.toString(),
-                            style: const TextStyle(
-                                color: const Color(0xffFFF9F9),
-                                fontSize: 34,
-                                fontWeight: FontWeight.bold
-
-                            ),
-                          ),
-                        ),
-
-                      const FadeIn(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                      FadeIn(
                         curve: Curves.easeIn,
-                        duration: Duration(milliseconds: 700),
+                        duration: const Duration(milliseconds: 600),
                         child: Text(
-                          "Compromised Passwords",
-                          style: TextStyle(
-                            color: const Color(0xffFFF9F9),
-                            fontSize: 18,
-
+                          compromised.toString(),
+                          style: const TextStyle(
+                              color: Color(0xffFFF9F9),
+                              fontSize: 34,
+                              fontWeight: FontWeight.bold
 
                           ),
                         ),
                       ),
-                    ],
-                  ),
+
+                    const FadeIn(
+                      curve: Curves.easeIn,
+                      duration: Duration(milliseconds: 700),
+                      child: Text(
+                        "Compromised Passwords",
+                        style: TextStyle(
+                          color: Color(0xffFFF9F9),
+                          fontSize: 18,
+
+
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -563,7 +700,7 @@ class _homePage extends State<Home>{
                                       scrollDirection: Axis.horizontal,
                                       itemBuilder: (BuildContext context, int index){
                                         return AnimatedContainer(
-                                          duration: Duration(milliseconds: 500),
+                                          duration: const Duration(milliseconds: 500),
                                           margin: const EdgeInsets.only(right: 10),
                                           child: OutlinedButton(
                                             onPressed: () => {
@@ -646,7 +783,7 @@ class _homePage extends State<Home>{
                                                     Row(
                                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
-                                                        Icon(Icons.email),
+                                                        const Icon(Icons.email),
                                                         Expanded(
                                                             child: AutoSizeText(" : " + currentList[currIndex].Email[index], maxLines: 1,),
                                                         ),
@@ -663,7 +800,7 @@ class _homePage extends State<Home>{
                                                     Row(
                                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
-                                                        Icon(Icons.password),
+                                                        const Icon(Icons.password),
                                                         Expanded(
                                                             child: Text(" : " + currentList[currIndex].Password[index]),
                                                         ),
@@ -718,7 +855,7 @@ class _homePage extends State<Home>{
                                                             onPressed: (){
                                                               Navigator.pop(context);
                                                             },
-                                                            child: Text("Close")
+                                                            child: const Text("Close")
                                                         ),
                                                       ],
                                                     )
@@ -809,19 +946,19 @@ class _homePage extends State<Home>{
                                 showDialog(context: context, builder: (_) =>
                                 Center(
                                   child: Card(
-                                    shape: RoundedRectangleBorder(
+                                    shape: const RoundedRectangleBorder(
                                       borderRadius: BorderRadius.all(Radius.circular(15))
                                     ),
                                     child: Container(
                                       width: MediaQuery.of(context).size.width * 0.8,
                                       height: 275,
-                                      padding: EdgeInsets.only(top: 20, bottom: 20, left: 30, right: 30),
-                                      decoration: BoxDecoration(
+                                      padding: const EdgeInsets.only(top: 20, bottom: 20, left: 30, right: 30),
+                                      decoration: const BoxDecoration(
                                           borderRadius: BorderRadius.all(Radius.circular(15))
                                       ),
                                       child: Column(
                                         children: [
-                                        Text("Add Account", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),),
+                                        const Text("Add Account", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),),
                                           Expanded(
                                             flex: 1,
                                               child: Column(
@@ -830,7 +967,7 @@ class _homePage extends State<Home>{
 
                                                   TextField(
                                                       decoration: const InputDecoration(hintText: "App Name"),
-                                                      style: TextStyle(fontSize: 14),
+                                                      style: const TextStyle(fontSize: 14),
                                                       onChanged: (val) {
                                                         setState((){
                                                           tempName = _titleCon.text;
@@ -845,9 +982,9 @@ class _homePage extends State<Home>{
                                                         tempMail = _emailCon.text;
                                                       });
                                                     },
-                                                    style: TextStyle(fontSize: 14),
+                                                    style: const TextStyle(fontSize: 14),
                                                     controller: _emailCon,
-                                                    autofillHints: [AutofillHints.email],
+                                                    autofillHints: const [AutofillHints.email],
                                                   ),
                                                   TextField(
                                                     decoration: const InputDecoration(hintText: "Password"),
@@ -856,9 +993,9 @@ class _homePage extends State<Home>{
                                                         tempPass = _passCon.text;
                                                       });
                                                     },
-                                                    style: TextStyle(fontSize: 14),
+                                                    style: const TextStyle(fontSize: 14),
                                                     controller: _passCon,
-                                                    autofillHints: [AutofillHints.password],
+                                                    autofillHints: const [AutofillHints.password],
                                                     onEditingComplete: () => TextInput.finishAutofillContext(),
                                                   ),
                                                 ],
@@ -892,13 +1029,13 @@ class _homePage extends State<Home>{
 
                                 );
                               },
-                              child: const Text("Add Account"),
                               style: ButtonStyle(
                                   backgroundColor: MaterialStateProperty.all<Color>(const Color(0xff8269B8)),
                                   foregroundColor: MaterialStateProperty.all<Color>(const Color(0xffFFF9F9)),
                                   minimumSize: MaterialStateProperty.all<Size>(Size(MediaQuery.of(context).size.width * 0.8, 50))
 
                               ),
+                              child: const Text("Add Account"),
                             )
                         ),
                       )
@@ -912,19 +1049,19 @@ class _homePage extends State<Home>{
             children: [
               Expanded(
                 flex: 36,
-                child: Container(
+                child: SizedBox(
 
                   width: MediaQuery.of(context).size.width * .85,
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: Card(
                       color: const Color(0xffFFF9F9),
-                      child: Container(
+                      child: SizedBox(
                         height: MediaQuery.of(context).size.height * .1,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Container(
+                            SizedBox(
                               width: MediaQuery.of(context).size.width * 0.40,
                               child: Center(
                                 child: Row(
@@ -950,20 +1087,20 @@ class _homePage extends State<Home>{
                                 borderRadius: BorderRadius.circular(15)
                               ),
                             ),
-                            Container(
+                            SizedBox(
                               width: MediaQuery.of(context).size.width * 0.40,
                               child: Center(
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: const [
+                                  children: [
                                     Text(
-                                      "0",
-                                      style: TextStyle(
+                                      _identical.toString(),
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 25
                                       ),
                                     ),
-                                    Text("Identical\nPasswords")
+                                    const Text("Identical\nPasswords")
                                   ],
                                 ),
                               ),

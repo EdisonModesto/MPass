@@ -48,7 +48,6 @@ class _generate extends State<Generate>{
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _generatePasswords();
   }
@@ -64,24 +63,22 @@ class _generate extends State<Generate>{
               //Top Part
               Expanded(
                 flex: 30,
-                child: Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      FadeIn(
-                        curve: Curves.easeIn,
-                        duration: Duration(milliseconds: 600),
-                        child: Text(
-                          "Password Generator",
-                          style: TextStyle(
-                              color: Color(0xffFFF9F9),
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold
-                          ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    FadeIn(
+                      curve: Curves.easeIn,
+                      duration: Duration(milliseconds: 600),
+                      child: Text(
+                        "Password Generator",
+                        style: TextStyle(
+                            color: Color(0xffFFF9F9),
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold
                         ),
-                      )
-                    ],
-                  ),
+                      ),
+                    )
+                  ],
                 ),
               ),
 
@@ -117,7 +114,7 @@ class _generate extends State<Generate>{
                           child: Column(
                             children: [
                               //Text Lbl
-                              Container(
+                              SizedBox(
                                 width: MediaQuery.of(context).size.width * 1,
                                 child: const Text(
                                   "Generated Passwords",
@@ -136,7 +133,7 @@ class _generate extends State<Generate>{
                       Expanded(
                           flex: 71,
                           child: Container(
-                            margin: EdgeInsets.only(top: 15, bottom: 10),
+                            margin: const EdgeInsets.only(top: 15, bottom: 10),
                             child: ListView.builder(
                               itemCount: 4,
                               itemBuilder: (BuildContext context, int index){
@@ -156,7 +153,7 @@ class _generate extends State<Generate>{
                                     ),
 
                                     trailing: IconButton(
-                                      padding: EdgeInsets.only(top: 10,bottom: 10),
+                                      padding: const EdgeInsets.only(top: 10,bottom: 10),
                                         onPressed: (){
                                           Clipboard.setData(ClipboardData(
                                               text: _Password[index]));
@@ -171,7 +168,7 @@ class _generate extends State<Generate>{
                                       children: [
                                         Text(
                                           _Password[index],
-                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                          style: const TextStyle(fontWeight: FontWeight.bold),
                                         ),
                                       ],
                                     ),
@@ -179,7 +176,7 @@ class _generate extends State<Generate>{
                                 );
                               },
                               shrinkWrap: true,
-                              padding: EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 5),
+                              padding: const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 5),
 
                             ) ,
 
@@ -192,17 +189,17 @@ class _generate extends State<Generate>{
                         //button
                         flex: 13,
                         child: Container(
-                            color: Color(0xffA491CD),
+                            color: const Color(0xffA491CD),
                             width: MediaQuery.of(context).size.width * 1,
                             child: ElevatedButton(
                               onPressed: _generatePasswords,
-                              child: Text("Generate"),
                               style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all<Color>(Color(0xff8269B8)),
-                                  foregroundColor: MaterialStateProperty.all<Color>(Color(0xffFFF9F9)),
+                                  backgroundColor: MaterialStateProperty.all<Color>(const Color(0xff8269B8)),
+                                  foregroundColor: MaterialStateProperty.all<Color>(const Color(0xffFFF9F9)),
                                   minimumSize: MaterialStateProperty.all<Size>(Size(MediaQuery.of(context).size.width * 0.8, 50))
 
                               ),
+                              child: const Text("Generate"),
                             )
                         ),
                       )
@@ -216,21 +213,21 @@ class _generate extends State<Generate>{
             children: [
               Expanded(
                 flex: 36,
-                child: Container(
+                child: SizedBox(
 
                   width: MediaQuery.of(context).size.width * .85,
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: Card(
-                      color: Color(0xffFFF9F9),
-                      child: Container(
+                      color: const Color(0xffFFF9F9),
+                      child: SizedBox(
                         height: MediaQuery.of(context).size.height * .1,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Container(
                               width: MediaQuery.of(context).size.width * 0.40,
-                              padding: EdgeInsets.only(left: 10, right: 10),
+                              padding: const EdgeInsets.only(left: 10, right: 10),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,7 +239,7 @@ class _generate extends State<Generate>{
                                         width: 25,
                                         child: Checkbox(
                                           value: addSymbols,
-                                          activeColor: Color(0xff8269B8),
+                                          activeColor: const Color(0xff8269B8),
                                           onChanged: (value){
                                             setState((){});
                                             if(value == true){
@@ -254,8 +251,8 @@ class _generate extends State<Generate>{
                                         ),
                                       ),
                                       Transform.translate(
-                                        offset: Offset(6, 0),
-                                        child: Text("Add Symbols"),
+                                        offset: const Offset(6, 0),
+                                        child: const Text("Add Symbols"),
                                       )
                                     ],
                                   ),
@@ -265,7 +262,7 @@ class _generate extends State<Generate>{
                                         height: 25,
                                         width: 25,
                                         child: Checkbox(
-                                          activeColor: Color(0xff8269B8),
+                                          activeColor: const Color(0xff8269B8),
                                           value: addLength,
                                           onChanged: (value){
 
@@ -279,8 +276,8 @@ class _generate extends State<Generate>{
                                         ),
                                       ),
                                       Transform.translate(
-                                        child: Text("Add Length", textAlign: TextAlign.left),
-                                        offset: Offset(6, 0),
+                                        offset: const Offset(6, 0),
+                                        child: const Text("Add Length", textAlign: TextAlign.left),
                                       )
                                     ],
                                   )
@@ -288,14 +285,14 @@ class _generate extends State<Generate>{
                               ),
                             ),
                             Container(
-                              margin: EdgeInsets.only(top: 15, bottom: 15),
+                              margin: const EdgeInsets.only(top: 15, bottom: 15),
                               width: MediaQuery.of(context).size.width * 0.01,
                               decoration: BoxDecoration(
-                                  color: Color(0xffBAABDA),
+                                  color: const Color(0xffBAABDA),
                                   borderRadius: BorderRadius.circular(15)
                               ),
                             ),
-                            Container(
+                            SizedBox(
                               width: MediaQuery.of(context).size.width * 0.40,
                               child: Center(
                                 child: TextButton(

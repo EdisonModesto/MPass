@@ -43,6 +43,7 @@ dependencies:
   expandable: ^5.0.1
   webview_flutter: ^3.0.4
   slider_button: ^2.0.0
+  lottie: ^1.4.2
 
 dev_dependencies:
   flutter_test:
@@ -82,6 +83,7 @@ flutter:
     - assets/images/settingsIcon.png
     - assets/images/coffeeIcon.png
     - assets/images/MPassLogo.png
+    - assets/lottie/lock.json
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

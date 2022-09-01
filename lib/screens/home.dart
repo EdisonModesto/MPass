@@ -5,6 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mpass/colors/AppColors.dart';
 import 'package:mpass/compromised.dart';
+import 'package:mpass/dialogs/viewPassDialog.dart';
+import 'package:mpass/listviews/allList.dart';
+import 'package:mpass/listviews/searchListView.dart';
+import 'package:mpass/listviews/socialListView.dart';
+import 'package:mpass/providers/WorkProvider.dart';
+import 'package:mpass/providers/allPassProvider.dart';
+import 'package:mpass/providers/mostUsedProvider.dart';
+import 'package:mpass/providers/searchProvider.dart';
 import 'package:mpass/providers/socialProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,10 +74,7 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
 
   @override
   void initState() {
-    _getPasswords();
-    _checkIdentical();
-    _checkBreached();
-    currentList = [_AccDetails,_mostUsed,_social,_work, _searchList,];
+    currentList = [_AccDetails,_mostUsed,_social,_work, _searchList];
     _lottieController = AnimationController(vsync: this);
     _lottieController.addStatusListener((status) {
       if(status == AnimationStatus.completed){
@@ -87,9 +92,7 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
 
   _searchPassword(String value) async{
 
-    _searchList.Title.clear();
-    _searchList.Email.clear();
-    _searchList.Password.clear();
+    context.read<searchProvider>().clearSearch();
 
     if(value.isEmpty){
       setState((){
@@ -102,55 +105,17 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
         currIndex = 4;
         _catSelected.fillRange(0, _catSelected.length, false);
       });
-      for (int i = 0; i < _AccDetails.Title.length; i++) {
-        if (_AccDetails.Title[i].contains(value)) {
+      for (int i = 0; i < context.read<allPassProvider>().Title.length; i++) {
+        if (context.read<allPassProvider>().Title[i].contains(value)) {
           setState(() {
-            _searchList.Title.add(_AccDetails.Title[i]);
-            _searchList.Email.add(_AccDetails.Email[i]);
-            _searchList.Password.add(_AccDetails.Password[i]);
-            _searchList.pointer.add(i);
+            context.read<searchProvider>().addSearchPass(context.read<allPassProvider>().Title[i], context.read<allPassProvider>().Email[i], context.read<allPassProvider>().Password[i], i);
           });
         }
       }
     }
   }
 
-  _getPasswords() async {
-      final PasswordPref = await SharedPreferences.getInstance();
-
-
-      setState(() {
-
-        _AccDetails.Title = PasswordPref.getStringList('Titles')!;
-        _AccDetails.Email = PasswordPref.getStringList('Emails')!;
-        _AccDetails.Password = PasswordPref.getStringList('Passwords')!;
-      });
-
-      print("Loaded${_AccDetails.Title}, ${_AccDetails.Email},${_AccDetails.Password}");
-    }
-
-    _addPasswords(tempName, tempMail, tempPass){
-
-          setState(() {
-            _AccDetails.Title.add(tempName);
-            print(_AccDetails.Title);
-          });
-
-          setState((){
-            _AccDetails.Email.add(tempMail);
-          });
-
-          setState((){
-            _AccDetails.Password.add(tempPass);
-          });
-
-      _savePasswords();
-      _checkBreached();
-      _checkIdentical();
-    }
-
     _savePasswords() async{
-
 
     final PasswordPref = await SharedPreferences.getInstance();
 
@@ -170,8 +135,8 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
         _Compromised.severity.clear();
 
         Timer(const Duration(seconds: 3), () async {
-          for (int i = 0; i < _AccDetails.Title.length; i++) {
-            var hashedPass = sha1.convert(utf8.encode(_AccDetails.Password[i]))
+          for (int i = 0; i < context.read<allPassProvider>().Title.length; i++) {
+            var hashedPass = sha1.convert(utf8.encode(context.read<allPassProvider>().Password[i]))
                 .toString();
             print(hashedPass);
             print(hashedPass.substring(5, hashedPass.length));
@@ -187,9 +152,9 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
               if (SplittedResponse[j].contains(remainHash.toUpperCase())) {
                 tempTotalCompro += 1;
                 List<String> severety = SplittedResponse[j].split(":");
-                _Compromised.Title.add(_AccDetails.Title[i]);
-                _Compromised.Email.add(_AccDetails.Email[i]);
-                _Compromised.Password.add(_AccDetails.Password[i]);
+                _Compromised.Title.add(context.read<allPassProvider>().Title[i]);
+                _Compromised.Email.add(context.read<allPassProvider>().Email[i]);
+                _Compromised.Password.add(context.read<allPassProvider>().Password[i]);
                 _Compromised.pointer.add(i);
 
                 _Compromised.severity.add(int.parse(severety[1]));
@@ -205,10 +170,7 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
               return Container(
                   color: Colors.redAccent,
                   height: 200,
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width * 1,
+                  width: MediaQuery.of(context).size.width * 1,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -230,91 +192,61 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                       ),
                       OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              side: const BorderSide(
-                                  color: Colors.white,
-                                  width: 1.5
+                              side: const BorderSide(color: Colors.white, width: 1.5
                               )
                           ),
                           onPressed: () {
                             Navigator.pop(context);
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
+                            showDialog(context: context, builder: (BuildContext context) {
                                   return Center(
                                       child: Card(
                                         shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(15))
+                                            borderRadius: BorderRadius.all(Radius.circular(15))
                                         ),
                                         child: Container(
                                           height: 500,
-                                          width: MediaQuery
-                                              .of(context)
-                                              .size
-                                              .width * 0.8,
-                                          padding: const EdgeInsets.only(top: 20,
-                                              bottom: 10,
-                                              right: 25,
-                                              left: 25),
+                                          width: MediaQuery.of(context).size.width * 0.8,
+                                          padding: const EdgeInsets.only(top: 20, bottom: 10, right: 25, left: 25),
                                           decoration: const BoxDecoration(
                                               color: Colors.white60,
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(15))
+                                              borderRadius: BorderRadius.all(Radius.circular(15))
                                           ),
                                           child: Column(
                                             children: [
                                               const Text(
                                                 "Compromised Accounts",
-                                                style: TextStyle(
-                                                  color: Colors.redAccent,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 18,
+                                                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 18,
                                                 ),
                                               ),
                                               Expanded(
                                                 flex: 1,
                                                 child: ListView.builder(
                                                   shrinkWrap: true,
-                                                  itemCount: _Compromised.Title
-                                                      .length,
-                                                  itemBuilder: (
-                                                      BuildContext context,
-                                                      int index) {
+                                                  itemCount: _Compromised.Title.length,
+                                                  itemBuilder: (BuildContext context, int index) {
                                                     return SingleChildScrollView(
                                                       child: ExpansionTile(
-                                                        leading: const Icon(
-                                                            Icons.warning),
-                                                        title: Text(_Compromised
-                                                            .Title[index]),
-                                                        expandedAlignment: Alignment
-                                                            .centerLeft,
-                                                        expandedCrossAxisAlignment: CrossAxisAlignment
-                                                            .start,
+                                                        leading: const Icon(Icons.warning),
+                                                        title: Text(_Compromised.Title[index]),
+                                                        expandedAlignment: Alignment.centerLeft,
+                                                        expandedCrossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
                                                           const AutoSizeText(
                                                               "The password of this account has been found on previously leaked databases. We suggest that you change your password ASAP.",
                                                               style: TextStyle(
                                                                   fontSize: 12)),
                                                           Text(
-                                                            "\nEmail: ${_Compromised
-                                                                .Email[index]}",
-                                                            textAlign: TextAlign
-                                                                .start,
-                                                            style: const TextStyle(
-                                                                fontSize: 12),),
+                                                            "\nEmail: ${_Compromised.Email[index]}",
+                                                            textAlign: TextAlign.start,
+                                                            style: const TextStyle(fontSize: 12),),
                                                           Text(
-                                                              "Password: ${_Compromised
-                                                                  .Password[index]}",
-                                                              textAlign: TextAlign
-                                                                  .start,
-                                                              style: const TextStyle(
-                                                                  fontSize: 12)),
+                                                              "Password: ${_Compromised.Password[index]}",
+                                                              textAlign: TextAlign.start,
+                                                              style: const TextStyle(fontSize: 12)),
                                                           AutoSizeText(
                                                             "Password was previously leaked ${_Compromised.severity[index]} times.",
                                                             style: const TextStyle(
-                                                                color: Colors
-                                                                    .redAccent,
-                                                                fontSize: 12),),
+                                                                color: Colors.redAccent, fontSize: 12),),
                                                         ],
 
                                                       ),
@@ -329,8 +261,7 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                                   showDialog(
                                                       barrierDismissible: false,
                                                       context: context,
-                                                      builder: (
-                                                          BuildContext context) {
+                                                      builder: (BuildContext context) {
                                                         LottieEffect = false;
                                                         lottieVisible = true;
                                                         var flex = MainAxisAlignment.center;
@@ -339,28 +270,14 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                                           return Center(
                                                             child: Card(
                                                               shape: const RoundedRectangleBorder(
-                                                                  borderRadius: BorderRadius
-                                                                      .all(Radius
-                                                                      .circular(15))
+                                                                  borderRadius: BorderRadius.all(Radius.circular(15))
                                                               ),
                                                               child: Container(
                                                                 height: 500,
-                                                                width: MediaQuery
-                                                                    .of(context)
-                                                                    .size
-                                                                    .width * 0.8,
-                                                                padding: const EdgeInsets
-                                                                    .only(top: 20,
-                                                                    bottom: 10,
-                                                                    right: 25,
-                                                                    left: 25),
-                                                                decoration: const BoxDecoration(
-                                                                    color: Colors
-                                                                        .white60,
-                                                                    borderRadius: BorderRadius
-                                                                        .all(Radius
-                                                                        .circular(
-                                                                        15))
+                                                                width: MediaQuery.of(context).size.width * 0.8,
+                                                                padding: const EdgeInsets.only(top: 20, bottom: 10, right: 25, left: 25),
+                                                                decoration: const BoxDecoration(color: Colors.white60,
+                                                                    borderRadius: BorderRadius.all(Radius.circular(15))
                                                                 ),
                                                                 child: Column(
                                                                   mainAxisAlignment: flex,
@@ -371,8 +288,7 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                                                         "assets/lottie/lock.json",
                                                                         controller: _lottieController,
                                                                         repeat: false,
-                                                                        onLoaded: (composition){
-                                                                          _lottieController.duration = Duration(seconds: 6);
+                                                                        onLoaded: (composition){_lottieController.duration = Duration(seconds: 6);
                                                                           _lottieController.forward().whenComplete(() =>
                                                                           setState((){
                                                                             LottieEffect = true;
@@ -384,85 +300,51 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                                                     ),
                                                                     Visibility(
                                                                       visible: LottieEffect,
-                                                                      child: Text(
-                                                                        "Accounts Fixed",
+                                                                      child: Text("Accounts Fixed",
                                                                         style: TextStyle(
                                                                           color: ColorObject.primary[currColor],
-                                                                          fontWeight: FontWeight
-                                                                              .bold,
+                                                                          fontWeight: FontWeight.bold,
                                                                           fontSize: 18,
                                                                         ),
                                                                       ),
                                                                     ),
                                                                     Visibility(
                                                                       visible: LottieEffect,
-                                                                      child: const Text(
-                                                                        "\nAll affected passwords have been replaced with strong passwords. You can copy the new passwords below and change them in their respective app settings.\n",
-                                                                        textAlign: TextAlign
-                                                                            .justify,
+                                                                      child: const Text("\nAll affected passwords have been replaced with strong passwords. You can copy the new passwords below and change them in their respective app settings.\n",
+                                                                        textAlign: TextAlign.justify,
                                                                         style: TextStyle(
-                                                                            color: Colors
-                                                                                .black,
+                                                                            color: Colors.black,
                                                                             fontSize: 11),),
                                                                     ),
                                                                     Visibility(
                                                                       visible: LottieEffect,
                                                                       child: Expanded(
                                                                         flex: 1,
-                                                                        child: ListView
-                                                                            .builder(
-                                                                            itemCount: _Compromised
-                                                                                .Title
-                                                                                .length,
+                                                                        child: ListView.builder(
+                                                                            itemCount: _Compromised.Title.length,
                                                                             shrinkWrap: true,
-                                                                            itemBuilder: (
-                                                                                BuildContext context,
-                                                                                int index) {
+                                                                            itemBuilder: (BuildContext context, int index) {
                                                                               return ListTile(
                                                                                   onTap: () {
-                                                                                    showDialog(
-                                                                                        context: context,
-                                                                                        builder: (
-                                                                                            BuildContext context) {
+                                                                                    showDialog(context: context, builder: (BuildContext context) {
                                                                                           return Center(
                                                                                             child: Card(
                                                                                               shape: const RoundedRectangleBorder(
-                                                                                                  borderRadius: BorderRadius
-                                                                                                      .all(
-                                                                                                      Radius
-                                                                                                          .circular(
-                                                                                                          15))
+                                                                                                  borderRadius: BorderRadius.all(Radius.circular(15))
                                                                                               ),
                                                                                               child: Container(
-                                                                                                width: MediaQuery
-                                                                                                    .of(
-                                                                                                    context)
-                                                                                                    .size
-                                                                                                    .width *
-                                                                                                    0.7,
+                                                                                                width: MediaQuery.of(context).size.width * 0.7,
                                                                                                 height: 100,
-                                                                                                padding: const EdgeInsets
-                                                                                                    .only(
-                                                                                                    top: 20,
-                                                                                                    bottom: 20,
-                                                                                                    right: 25,
-                                                                                                    left: 25),
+                                                                                                padding: const EdgeInsets.only(top: 20, bottom: 20, right: 25, left: 25),
                                                                                                 decoration: const BoxDecoration(
-                                                                                                    borderRadius: BorderRadius
-                                                                                                        .all(
-                                                                                                        Radius
-                                                                                                            .circular(
-                                                                                                            15))
+                                                                                                    borderRadius: BorderRadius.all(Radius.circular(15))
                                                                                                 ),
                                                                                                 child: Column(
                                                                                                   mainAxisAlignment: MainAxisAlignment
                                                                                                       .spaceBetween,
                                                                                                   children: [
-                                                                                                    const Text(
-                                                                                                        "Password:"),
-                                                                                                    Text(
-                                                                                                        _Compromised
-                                                                                                            .Password[index]),
+                                                                                                    const Text("Password:"),
+                                                                                                    Text(_Compromised.Password[index]),
                                                                                                   ],
                                                                                                 ),
                                                                                               ),
@@ -470,61 +352,34 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                                                                           );
                                                                                         });
                                                                                   },
-                                                                                  contentPadding: const EdgeInsets
-                                                                                      .all(
-                                                                                      0),
+                                                                                  contentPadding: const EdgeInsets.all(0),
                                                                                   leading: Container(
-                                                                                    padding: const EdgeInsets
-                                                                                        .only(
-                                                                                        top: 10,
-                                                                                        bottom: 10),
-                                                                                    child: Image
-                                                                                        .asset(
-                                                                                        "assets/images/fbIcon.png"),
+                                                                                    padding: const EdgeInsets.only(top: 10, bottom: 10),
+                                                                                    child: Image.asset("assets/images/fbIcon.png"),
                                                                                   ),
 
                                                                                   trailing: IconButton(
                                                                                     onPressed: () {
-                                                                                      Clipboard
-                                                                                          .setData(
-                                                                                          ClipboardData(
-                                                                                              text: _Compromised
-                                                                                                  .Password[index]));
-                                                                                      Fluttertoast
-                                                                                          .showToast(
-                                                                                          msg: "Password Copied!");
+                                                                                      Clipboard.setData(ClipboardData(text: _Compromised.Password[index]));
+                                                                                      Fluttertoast.showToast(msg: "Password Copied!");
                                                                                     },
-                                                                                    icon: Image
-                                                                                        .asset(
-                                                                                        "assets/images/copyicon.png"),
-                                                                                    padding: const EdgeInsets
-                                                                                        .only(
-                                                                                        top: 15,
-                                                                                        bottom: 15),
+                                                                                    icon: Image.asset("assets/images/copyicon.png"),
+                                                                                    padding: const EdgeInsets.only(top: 15, bottom: 15),
                                                                                   ),
                                                                                   title: Container(
-                                                                                    padding: const EdgeInsets
-                                                                                        .only(
-                                                                                        left: 10),
+                                                                                    padding: const EdgeInsets.only(left: 10),
                                                                                     child: Column(
-                                                                                      crossAxisAlignment: CrossAxisAlignment
-                                                                                          .start,
-                                                                                      mainAxisAlignment: MainAxisAlignment
-                                                                                          .spaceEvenly,
+                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                                                       children: [
-                                                                                        Text(
-
-                                                                                          _Compromised
-                                                                                              .Title[index],
+                                                                                        Text(_Compromised.Title[index],
                                                                                           style: const TextStyle(
-                                                                                              fontWeight: FontWeight
-                                                                                                  .bold,
+                                                                                              fontWeight: FontWeight.bold,
                                                                                               fontSize: 14
                                                                                           ),
                                                                                         ),
                                                                                         AutoSizeText(
-                                                                                          _Compromised
-                                                                                              .Email[index],
+                                                                                          _Compromised.Email[index],
                                                                                           //_Emails![index],
                                                                                           style: const TextStyle(
                                                                                               fontSize: 12),
@@ -541,12 +396,9 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                                                       visible: LottieEffect,
                                                                       child: ElevatedButton(
                                                                           onPressed: () {
-                                                                            Navigator
-                                                                                .pop(
-                                                                                context);
+                                                                            Navigator.pop(context);
                                                                           },
-                                                                          child: const Text(
-                                                                              "Done")),
+                                                                          child: const Text("Done")),
                                                                     ),
                                                                   ],
                                                                 ),
@@ -591,7 +443,7 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
           temp += strCollection[rand.nextInt(104)];
         }
         _Compromised.Password[i] = temp;
-        _AccDetails.Password[_Compromised.pointer[i]] = temp;
+        context.read<allPassProvider>().Password[_Compromised.pointer[i]] = temp;
       }
 
       _savePasswords();
@@ -615,9 +467,6 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
   Widget build(BuildContext context){
       _AccDetails.isShow = true;
       currColor = context.watch<colorProvider>().colorIndex;
-      _social.Title = context.watch<socialProvider>().Title;
-      _social.Email = context.watch<socialProvider>().Email;
-      _social.Password = context.watch<socialProvider>().Password;
 
     return SafeArea(
       child: Stack(
@@ -703,10 +552,7 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                     const Text(
                                       "Password Vault",
                                       textAlign: TextAlign.left,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 17
-                                      ),
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
                                     ),
                                     IconButton(
                                         iconSize: 20,
@@ -814,171 +660,13 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                           child: Container(
                             margin: const EdgeInsets.only(top: 10, bottom: 10),
                             child: ListView.builder(
-                              itemCount: currentList[currIndex].Title.length,
-                              itemBuilder: (BuildContext context, int index){
+                              itemCount: _catSelected[0] ? context.watch<allPassProvider>().length : _catSelected[1] ? context.watch<mostUsedProvider>().length : _catSelected[2] ? context.watch<socialProvider>().length : _catSelected[3] ? context.watch<workProvider>().length : context.watch<searchProvider>().length,
+                                itemBuilder: (BuildContext context, int index){
                                 return Container(
                                     width: MediaQuery.of(context).size.width * 1,
                                     margin: const EdgeInsets.only(bottom: 20),
                                     height: 50,
-                                    child: ListTile(
-                                        onTap: (){
-                                          showDialog(context: context, builder: (BuildContext context){
-                                            return Center(
-                                              child: Card(
-                                                shape: const RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.all(Radius.circular(15))
-                                                ),
-                                                child: Container(
-                                                padding: const EdgeInsets.only(top: 20, bottom: 10, right: 25, left: 25),
-                                                width: MediaQuery.of(context).size.width * 0.8,
-                                                height: 230,
-                                                decoration: const BoxDecoration(
-                                                  color: Color(0xffFFF9F9),
-                                                  borderRadius: BorderRadius.all(Radius.circular(15))
-                                                ),
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    AutoSizeText(
-                                                      currentList[currIndex].Title[index],
-                                                      maxLines: 1,
-                                                      style: const TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        fontSize: 20,
-                                                      ),
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                      children: [
-                                                        const Icon(Icons.email),
-                                                        Expanded(
-                                                            child: AutoSizeText(" : " + currentList[currIndex].Email[index], maxLines: 1,),
-                                                        ),
-                                                        IconButton(
-                                                            onPressed: (){
-                                                              Clipboard.setData(ClipboardData(
-                                                                  text: currentList[currIndex].Email[index]));
-                                                              Fluttertoast.showToast(msg: "Email Copied!");
-                                                            },
-                                                            icon: Image.asset("assets/images/copyicon.png", width: 25, height: 25,)
-                                                        )
-                                                      ],
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                      children: [
-                                                        const Icon(Icons.password),
-                                                        Expanded(
-                                                            child: Text(" : " + currentList[currIndex].Password[index]),
-                                                        ),
-                                                        IconButton(
-                                                            onPressed: (){
-                                                              Clipboard.setData(ClipboardData(
-                                                                  text: currentList[currIndex].Password[index]));
-                                                              Fluttertoast.showToast(msg: "Password Copied");
-                                                            },
-                                                            icon: Image.asset("assets/images/copyicon.png", width: 25, height: 25,))
-                                                      ],
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                      children: [
-                                                        TextButton(
-                                                            onPressed: (){
-
-                                                              if(currIndex == 0){
-                                                                setState((){
-                                                                  currentList[currIndex].Title.removeAt(index);
-                                                                  currentList[currIndex].Email.removeAt(index);
-                                                                  currentList[currIndex].Password.removeAt(index);
-                                                                });
-                                                              } else if(currIndex == 4) {
-                                                                setState((){
-                                                                  //deletes from main list
-                                                                  _AccDetails.Title.removeAt(_searchList.pointer[index]);
-                                                                  _AccDetails.Email.removeAt(_searchList.pointer[index]);
-                                                                  _AccDetails.Password.removeAt(_searchList.pointer[index]);
-
-                                                                  //deletes from search list
-                                                                  currentList[currIndex].Title.removeAt(index);
-                                                                  currentList[currIndex].Email.removeAt(index);
-                                                                  currentList[currIndex].Password.removeAt(index);
-                                                                });
-                                                              }
-                                                              _savePasswords();
-
-                                                              Fluttertoast.showToast(msg: "Account Removed");
-                                                              _savePasswords();
-                                                              Navigator.pop(context);
-                                                            },
-                                                            child: const Text(
-                                                                "Delete",
-                                                              style: TextStyle(
-                                                                color: Colors.redAccent
-                                                              ),
-                                                            )
-                                                        ),
-                                                        TextButton(
-                                                            onPressed: (){
-                                                              Navigator.pop(context);
-                                                            },
-                                                            child: const Text("Close")
-                                                        ),
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                              )
-                                            );
-                                          });
-                                        },
-                                        contentPadding: const EdgeInsets.all(0),
-                                        leading: Container(
-                                          padding: const EdgeInsets.only(
-                                              top: 5, bottom: 5),
-                                          child: Image.asset(
-                                              "assets/images/fbIcon.png"),
-                                        ),
-
-                                        trailing: IconButton(
-                                          onPressed: () {
-                                            Clipboard.setData(ClipboardData(
-                                                text: currentList[currIndex].Password[index]));
-                                            Fluttertoast.showToast(
-                                                msg: "Password Copied!");
-                                          },
-                                          icon: Image.asset(
-                                              "assets/images/copyicon.png"),
-                                          padding: const EdgeInsets.only(
-                                              top: 10, bottom: 10),
-                                        ),
-                                        title: Container(
-                                          padding: const EdgeInsets.only(
-                                              left: 10),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment
-                                                .start,
-                                            mainAxisAlignment: MainAxisAlignment
-                                                .spaceEvenly,
-                                            children: [
-                                              Text(
-
-                                                currentList[currIndex].Title[index],
-                                                style: const TextStyle(
-                                                    fontWeight: FontWeight
-                                                        .bold),
-                                              ),
-                                              AutoSizeText(
-                                                currentList[currIndex].Email[index],
-                                                //_Emails![index],
-                                                style: const TextStyle(fontSize: 14),
-                                                maxLines: 1,
-                                              )
-                                            ],
-                                          ),
-                                        )
-                                    ),
+                                    child: _catSelected[0] ? allList(index: index) : _catSelected[1] ? Text("most used") : _catSelected[2] ? socialListView(index: index) : _catSelected[3] ? Text("Work") : Text("search") //searchListView(index: index)
 
 
 
@@ -1080,7 +768,7 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                               ),
                                               TextButton(
                                                   onPressed: (){
-                                                    _addPasswords(tempName,_emailCon.text,_passCon.text);
+                                                    context.read<allPassProvider>().addallPass(tempName, _emailCon.text, _passCon.text);
                                                     Navigator.pop(context, true);
                                                   },
 

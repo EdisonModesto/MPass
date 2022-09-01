@@ -3,35 +3,34 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class socialProvider with ChangeNotifier{
+class workProvider with ChangeNotifier{
   List<String> Title = [];
   List<String> Email = [];
   List<String> Password = [];
   int length = 0;
 
-  void addSocial(String title, email, password){
+  void addWork(String title, email, password){
     Title.add(title);
     Email.add(email);
     Password.add(password);
-    length = Title.length;
-    _saveSocial();
+    _saveWork();
     notifyListeners();
   }
 
-  void _saveSocial()async{
+  void _saveWork()async{
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList("SocialTitle", Title);
-    prefs.setStringList("SocialEmail", Email);
-    prefs.setStringList("SocialPass", Password);
+    prefs.setStringList("WorkTitle", Title);
+    prefs.setStringList("WorkEmail", Email);
+    prefs.setStringList("WorkPass", Password);
     notifyListeners();
   }
 
-  void initSocial()async{
+  void initWork()async{
     final prefs = await SharedPreferences.getInstance();
 
-    Title = prefs.getStringList('SocialTitle')!;
-    Email = prefs.getStringList('SocialEmail')!;
-    Password = prefs.getStringList('SocialPass')!;
+    Title = prefs.getStringList('WorkTitle')!;
+    Email = prefs.getStringList('WorkEmail')!;
+    Password = prefs.getStringList('WorkPass')!;
     notifyListeners();
   }
 

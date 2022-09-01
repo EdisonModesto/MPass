@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mpass/colors/AppColors.dart';
 import 'package:mpass/passwords.dart';
+import 'package:mpass/providers/WorkProvider.dart';
+import 'package:mpass/providers/allPassProvider.dart';
 import 'package:mpass/providers/colors.dart';
+import 'package:mpass/providers/mostUsedProvider.dart';
+import 'package:mpass/providers/searchProvider.dart';
 import 'package:mpass/providers/socialProvider.dart';
 import 'package:mpass/screens/generate.dart';
 import 'package:mpass/screens/home.dart';
@@ -24,7 +28,11 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_)=> colorProvider()),
-        ChangeNotifierProvider(create: (_)=> socialProvider())
+        ChangeNotifierProvider(create: (_)=> allPassProvider()),
+        ChangeNotifierProvider(create: (_)=> socialProvider()),
+        ChangeNotifierProvider(create: (_)=> workProvider()),
+        ChangeNotifierProvider(create: (_)=> mostUsedProvider()),
+        ChangeNotifierProvider(create: (_)=> searchProvider())
       ],
       child: const MyApp(),
     )
@@ -95,6 +103,10 @@ class _MyHomePageState extends State<MyHomePage> {
     //_checkColors();
     context.read<colorProvider>().initColor();
     context.read<socialProvider>().initSocial();
+    context.read<allPassProvider>().initallPass();
+    context.read<workProvider>().initWork();
+    context.read<mostUsedProvider>().initMostUsed();
+    context.read<searchProvider>().initSearch();
     super.initState();
   }
 

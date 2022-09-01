@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:mpass/colors/AppColors.dart';
 import 'package:mpass/compromised.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +19,8 @@ import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:http/http.dart';
 import 'package:crypto/crypto.dart';
 
+import '../providers/colors.dart';
+
 
 class Home extends StatefulWidget{
   const Home({Key? key}) : super(key: key);
@@ -26,6 +30,10 @@ class Home extends StatefulWidget{
 }
 
 class _homePage extends State<Home> with TickerProviderStateMixin{
+
+  //Color Object instance
+  AppColors ColorObject = AppColors();
+  int currColor = 0;
 
   //categories Button and states
   final List<String> _category = ["All", "Most Used", "Social", "Work"];
@@ -375,11 +383,10 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                                                     ),
                                                                     Visibility(
                                                                       visible: LottieEffect,
-                                                                      child: const Text(
+                                                                      child: Text(
                                                                         "Accounts Fixed",
                                                                         style: TextStyle(
-                                                                          color: Color(
-                                                                              0xff8269B8),
+                                                                          color: ColorObject.primary[currColor],
                                                                           fontWeight: FontWeight
                                                                               .bold,
                                                                           fontSize: 18,
@@ -606,6 +613,8 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
   @override
   Widget build(BuildContext context){
       _AccDetails.isShow = true;
+      currColor = context.watch<colorProvider>().colorIndex;
+
     return SafeArea(
       child: Stack(
         children: [
@@ -770,10 +779,10 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                             },
                                             style: OutlinedButton.styleFrom(
                                                 side: BorderSide(
-                                                    color: _catSelected[index] ? const Color(0xffA491CD) : const Color(0xff8269B8), width: 1
+                                                    color: _catSelected[index] ? ColorObject.accent[currColor] : ColorObject.accent[currColor], width: 1
                                                 ),
 
-                                                backgroundColor: _catSelected[index] ? const Color(0xffA491CD) : const Color(0xffFFF9F9),
+                                                backgroundColor: _catSelected[index] ? ColorObject.accent[currColor] : const Color(0xffFFF9F9),
                                                 minimumSize: const Size(20, 0.5)
 
                                             ),
@@ -1084,7 +1093,7 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                 );
                               },
                               style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all<Color>(const Color(0xff8269B8)),
+                                  backgroundColor: MaterialStateProperty.all<Color>(ColorObject.primary[currColor]),
                                   foregroundColor: MaterialStateProperty.all<Color>(const Color(0xffFFF9F9)),
                                   minimumSize: MaterialStateProperty.all<Size>(Size(MediaQuery.of(context).size.width * 0.8, 50))
 

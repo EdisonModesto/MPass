@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mpass/colors/AppColors.dart';
 import 'package:mpass/passwords.dart';
+import 'package:mpass/providers/colors.dart';
 import 'package:mpass/screens/generate.dart';
 import 'package:mpass/screens/home.dart';
 import 'package:mpass/screens/settings.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'categories/mostUsed.dart';
 import 'categories/search.dart';
@@ -13,7 +19,15 @@ import 'compromised.dart';
 
 void main() async {
   await Future.delayed(const Duration(milliseconds: 200));
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+          ChangeNotifierProvider(create: (_)=> colorProvider())
+        ],
+      child: const MyApp(),
+    )
+
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -38,10 +52,8 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-
           primarySwatch: Colors.blue,
           fontFamily: 'Poppins',
-          scaffoldBackgroundColor: const Color(0xff8269B8),
       ),
 
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -68,34 +80,41 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  AppColors _appColors = new AppColors();
+
+  int currColor = 0 ;
 
   @override
   void initState() {
     late PageController controller;
+    //_checkColors();
+    context.read<colorProvider>().initColor();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+
+    currColor = context.watch<colorProvider>().colorIndex;
+
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+        backgroundColor: _appColors.primary[currColor],
+        resizeToAvoidBottomInset: false,
 
-      body: PageView(
-        controller: PageController(initialPage: 1),
-        children: [
-          //Settings
-          Settings(),
+        body: PageView(
+          controller: PageController(initialPage: 1),
+          children: [
+            //Settings
+            Settings(),
 
-          //Home
-          Home(),
-          
-          //Generate
-          Generate()
+            //Home
+            Home(),
 
-        ],
-      )
+            //Generate
+            Generate()
 
-
-    );
+          ],
+        )
+      );
   }
 }

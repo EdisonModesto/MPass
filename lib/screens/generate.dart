@@ -3,6 +3,11 @@ import 'dart:math';
 import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../colors/AppColors.dart';
+import '../providers/colors.dart';
 
 
 class Generate extends StatefulWidget{
@@ -12,12 +17,18 @@ class Generate extends StatefulWidget{
 
 class _generate extends State<Generate>{
 
+  //Colors object instance
+  final AppColors ColorObject = AppColors();
+  int currentPrim = 0, currentAccent = 0, currColor = 0;
+
   //String _Password = "";
   List<String> _Password = ["a", "a", "a", "a"];
 
   //symbol length boolean
   bool addSymbols = false;
   bool addLength = false;
+
+
 
   _generatePasswords(){
     setState(() {
@@ -46,14 +57,24 @@ class _generate extends State<Generate>{
     });
   }
 
+  initPref()async{
+    final prefs = await SharedPreferences.getInstance();
+
+
+
+  }
+
   @override
   void initState() {
     super.initState();
+    //initPref();
     _generatePasswords();
+    // Obtain shared preferences.
   }
 
   @override
   Widget build(BuildContext context){
+    currColor = context.watch<colorProvider>().colorIndex;
     return SafeArea(
       child: Stack(
         children: [
@@ -146,9 +167,9 @@ class _generate extends State<Generate>{
                                     contentPadding: const EdgeInsets.all(0),
                                     leading: Container(
                                       width: 15,
-                                      decoration: const BoxDecoration(
-                                          color: Color(0xffBAABDA),
-                                          borderRadius: BorderRadius.all(Radius.circular(4))
+                                      decoration: BoxDecoration(
+                                          color: ColorObject.accent[currColor],
+                                          borderRadius: const BorderRadius.all(Radius.circular(4))
                                       ),
                                     ),
 
@@ -194,8 +215,8 @@ class _generate extends State<Generate>{
                             child: ElevatedButton(
                               onPressed: _generatePasswords,
                               style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all<Color>(const Color(0xff8269B8)),
-                                  foregroundColor: MaterialStateProperty.all<Color>(const Color(0xffFFF9F9)),
+                                  backgroundColor: MaterialStateProperty.all<Color>( ColorObject.primary[currColor]),
+                                  foregroundColor: MaterialStateProperty.all<Color>(const Color(0xffFFFFFF)),
                                   minimumSize: MaterialStateProperty.all<Size>(Size(MediaQuery.of(context).size.width * 0.8, 50))
 
                               ),
@@ -239,7 +260,7 @@ class _generate extends State<Generate>{
                                         width: 25,
                                         child: Checkbox(
                                           value: addSymbols,
-                                          activeColor: const Color(0xff8269B8),
+                                          activeColor: ColorObject.accent[currColor],
                                           onChanged: (value){
                                             setState((){});
                                             if(value == true){
@@ -262,7 +283,7 @@ class _generate extends State<Generate>{
                                         height: 25,
                                         width: 25,
                                         child: Checkbox(
-                                          activeColor: const Color(0xff8269B8),
+                                          activeColor: ColorObject.accent[currColor],
                                           value: addLength,
                                           onChanged: (value){
 
@@ -288,7 +309,7 @@ class _generate extends State<Generate>{
                               margin: const EdgeInsets.only(top: 15, bottom: 15),
                               width: MediaQuery.of(context).size.width * 0.01,
                               decoration: BoxDecoration(
-                                  color: const Color(0xffBAABDA),
+                                  color: ColorObject.accent[currColor],
                                   borderRadius: BorderRadius.circular(15)
                               ),
                             ),

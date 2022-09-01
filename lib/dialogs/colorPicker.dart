@@ -61,7 +61,11 @@ class _customColorPickerState extends State<customColorPicker> {
             mainAxisSpacing: 8.0,
             children: List.generate(ColorObject.primary.length, (index){
               return Container(
-                color: ColorObject.primary[index],
+                decoration: BoxDecoration(
+                  color: ColorObject.primary[index],
+                  borderRadius: BorderRadius.all(Radius.circular(10))
+                ),
+                
                 child: TextButton(
                   onPressed: () {
                     _writePref(index);
@@ -69,7 +73,7 @@ class _customColorPickerState extends State<customColorPicker> {
                     //Fluttertoast.showToast(msg: index.toString() + " $chosenColor");
 
                   },
-                  child: Text("Selected", style: TextStyle(color: Colors.white),),
+                  child: Text("", style: TextStyle(color: Colors.white),),
                 ),
               );
             })

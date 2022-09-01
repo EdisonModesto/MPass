@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mpass/colors/AppColors.dart';
 import 'package:mpass/compromised.dart';
+import 'package:mpass/providers/socialProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -614,6 +615,9 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
   Widget build(BuildContext context){
       _AccDetails.isShow = true;
       currColor = context.watch<colorProvider>().colorIndex;
+      _social.Title = context.watch<socialProvider>().Title;
+      _social.Email = context.watch<socialProvider>().Email;
+      _social.Password = context.watch<socialProvider>().Password;
 
     return SafeArea(
       child: Stack(

@@ -5,6 +5,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mpass/dialogs/category.dart';
 import 'package:mpass/dialogs/colorPicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:slider_button/slider_button.dart';
@@ -136,7 +137,9 @@ class _settings extends State<Settings>{
                                   height: 50,
                                   child: TextButton(
                                     onPressed: () {
-
+                                      showDialog(context: context, builder: (BuildContext context){
+                                        return catDialog();
+                                      });
                                     },
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

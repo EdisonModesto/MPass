@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:mpass/colors/AppColors.dart';
 import 'package:mpass/passwords.dart';
 import 'package:mpass/providers/colors.dart';
+import 'package:mpass/providers/socialProvider.dart';
 import 'package:mpass/screens/generate.dart';
 import 'package:mpass/screens/home.dart';
 import 'package:mpass/screens/settings.dart';
@@ -22,8 +23,9 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-          ChangeNotifierProvider(create: (_)=> colorProvider())
-        ],
+        ChangeNotifierProvider(create: (_)=> colorProvider()),
+        ChangeNotifierProvider(create: (_)=> socialProvider())
+      ],
       child: const MyApp(),
     )
 
@@ -36,8 +38,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Color(0xff8269B8), //or set color with: Color(0xFF0000FF)
+    AppColors _appColors = new AppColors();
+
+    int currColor = context.watch<colorProvider>().colorIndex;
+    SystemChrome.setSystemUIOverlayStyle( SystemUiOverlayStyle(
+      statusBarColor: _appColors.primary[currColor], //or set color with: Color(0xFF0000FF)
     ));
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -89,6 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
     late PageController controller;
     //_checkColors();
     context.read<colorProvider>().initColor();
+    context.read<socialProvider>().initSocial();
     super.initState();
   }
 

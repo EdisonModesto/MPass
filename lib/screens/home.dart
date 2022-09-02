@@ -9,6 +9,7 @@ import 'package:mpass/dialogs/viewPassDialog.dart';
 import 'package:mpass/listviews/allList.dart';
 import 'package:mpass/listviews/searchListView.dart';
 import 'package:mpass/listviews/socialListView.dart';
+import 'package:mpass/listviews/workListView.dart';
 import 'package:mpass/providers/WorkProvider.dart';
 import 'package:mpass/providers/allPassProvider.dart';
 import 'package:mpass/providers/mostUsedProvider.dart';
@@ -72,17 +73,6 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
   bool LottieEffect = false;
   var lottieVisible = true;
 
-  @override
-  void initState() {
-    currentList = [_AccDetails,_mostUsed,_social,_work, _searchList];
-    _lottieController = AnimationController(vsync: this);
-    _lottieController.addStatusListener((status) {
-      if(status == AnimationStatus.completed){
-       _lottieController.reset();
-      }
-    });
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -397,6 +387,9 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                                                       child: ElevatedButton(
                                                                           onPressed: () {
                                                                             Navigator.pop(context);
+                                                                            setState(() {
+                                                                              compromised = 0;
+                                                                            });
                                                                           },
                                                                           child: const Text("Done")),
                                                                     ),
@@ -446,13 +439,17 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
         context.read<allPassProvider>().Password[_Compromised.pointer[i]] = temp;
       }
 
+      setState((){
+        compromised = 0;
+      });
+
       _savePasswords();
     }
 
     _checkIdentical()async{
 
       Timer(const Duration(seconds: 1), () async{
-        List<String> temp = _AccDetails.Password;
+        List<String> temp = context.watch<allPassProvider>().Password;
         var removedDupes = temp.toSet().toList();
 
         setState((){
@@ -464,10 +461,23 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
 
 
   @override
+  void initState() {
+    _checkBreached();
+    _checkIdentical();
+    currentList = [_AccDetails,_mostUsed,_social,_work, _searchList];
+    _lottieController = AnimationController(vsync: this);
+    _lottieController.addStatusListener((status) {
+      if(status == AnimationStatus.completed){
+        _lottieController.reset();
+      }
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context){
       _AccDetails.isShow = true;
       currColor = context.watch<colorProvider>().colorIndex;
-
     return SafeArea(
       child: Stack(
         children: [
@@ -592,7 +602,6 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                                         )
                                                       ],
                                                     )
-
                                                 ),
                                               )
                                             );
@@ -631,7 +640,6 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                                 side: BorderSide(
                                                     color: _catSelected[index] ? ColorObject.accent[currColor] : ColorObject.accent[currColor], width: 1
                                                 ),
-
                                                 backgroundColor: _catSelected[index] ? ColorObject.accent[currColor] : const Color(0xffFFF9F9),
                                                 minimumSize: const Size(20, 0.5)
 
@@ -666,7 +674,7 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                     width: MediaQuery.of(context).size.width * 1,
                                     margin: const EdgeInsets.only(bottom: 20),
                                     height: 50,
-                                    child: _catSelected[0] ? allList(index: index) : _catSelected[1] ? Text("most used") : _catSelected[2] ? socialListView(index: index) : _catSelected[3] ? Text("Work") : Text("search") //searchListView(index: index)
+                                    child: _catSelected[0] ? allList(index: index) : _catSelected[1] ? Text("most used") : _catSelected[2] ? socialListView(index: index) : _catSelected[3] ? workListView(index: index) : searchListView(index: index)
 
 
 

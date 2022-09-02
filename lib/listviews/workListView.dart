@@ -2,32 +2,27 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:mpass/dialogs/viewSocialDialog.dart';
-import 'package:mpass/providers/socialProvider.dart';
+import 'package:mpass/categories/work.dart';
+import 'package:mpass/dialogs/viewWorkDialog.dart';
+import 'package:mpass/providers/WorkProvider.dart';
 import 'package:provider/provider.dart';
 
-import '../dialogs/viewPassDialog.dart';
+import '../dialogs/viewSocialDialog.dart';
 
-class socialListView extends StatefulWidget {
-  const socialListView({Key? key, required this.index}) : super(key: key);
+class workListView extends StatefulWidget {
+  const workListView({Key? key, required this.index}) : super(key: key);
   final int index;
   @override
-  State<socialListView> createState() => _socialListViewState();
+  State<workListView> createState() => _workListViewState();
 }
 
-class _socialListViewState extends State<socialListView> {
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
+class _workListViewState extends State<workListView> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
         onTap: (){
           showDialog(context: context, builder: (BuildContext context){
-            return viewSocialDialog(index: widget.index);
+            return viewWorkDialog(index: widget.index);
           });
         },
         contentPadding: const EdgeInsets.all(0),
@@ -38,7 +33,7 @@ class _socialListViewState extends State<socialListView> {
 
         trailing: IconButton(
           onPressed: () {
-            Clipboard.setData(ClipboardData(text: context.watch<socialProvider>().Password[widget.index]));
+            Clipboard.setData(ClipboardData(text: context.watch<workProvider>().Password[widget.index]));
             Fluttertoast.showToast(msg: "Password Copied!");
           },
           icon: Image.asset("assets/images/copyicon.png"),
@@ -52,11 +47,11 @@ class _socialListViewState extends State<socialListView> {
             children: [
               Text(
 
-                context.watch<socialProvider>().Title[widget.index],
+                context.watch<workProvider>().Title[widget.index],
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               AutoSizeText(
-                context.watch<socialProvider>().Email[widget.index],
+                context.watch<workProvider>().Email[widget.index],
                 //_Emails![index],
                 style: const TextStyle(fontSize: 14),
                 maxLines: 1,

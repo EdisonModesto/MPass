@@ -18,6 +18,17 @@ class socialProvider with ChangeNotifier{
     notifyListeners();
   }
 
+  void deleteAllPass(int index)async{
+    await Future.delayed(Duration(milliseconds: 200));
+    Title.removeAt(index);
+    length = Title.length;
+    notifyListeners();
+    Email.removeAt(index);
+    Password.removeAt(index);
+    notifyListeners();
+    _saveSocial();
+  }
+
   void _saveSocial()async{
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList("SocialTitle", Title);
@@ -32,6 +43,7 @@ class socialProvider with ChangeNotifier{
     Title = prefs.getStringList('SocialTitle')!;
     Email = prefs.getStringList('SocialEmail')!;
     Password = prefs.getStringList('SocialPass')!;
+    length = Title.length;
     notifyListeners();
   }
 

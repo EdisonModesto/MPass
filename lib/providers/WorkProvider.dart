@@ -13,6 +13,18 @@ class workProvider with ChangeNotifier{
     Title.add(title);
     Email.add(email);
     Password.add(password);
+    length = Title.length;
+    _saveWork();
+    notifyListeners();
+  }
+
+  void deleteAllPass(int index)async{
+    await Future.delayed(const Duration(milliseconds: 200));
+    Title.removeAt(index);
+    length = Title.length;
+    notifyListeners();
+    Email.removeAt(index);
+    Password.removeAt(index);
     _saveWork();
     notifyListeners();
   }
@@ -31,6 +43,7 @@ class workProvider with ChangeNotifier{
     Title = prefs.getStringList('WorkTitle')!;
     Email = prefs.getStringList('WorkEmail')!;
     Password = prefs.getStringList('WorkPass')!;
+    length = Title.length;
     notifyListeners();
   }
 

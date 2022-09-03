@@ -33,7 +33,7 @@ class _workListViewState extends State<workListView> {
 
         trailing: IconButton(
           onPressed: () {
-            Clipboard.setData(ClipboardData(text: context.watch<workProvider>().Password[widget.index]));
+            Clipboard.setData(ClipboardData(text: context.read<workProvider>().Password[widget.index]));
             Fluttertoast.showToast(msg: "Password Copied!");
           },
           icon: Image.asset("assets/images/copyicon.png"),

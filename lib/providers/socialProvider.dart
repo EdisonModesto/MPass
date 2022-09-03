@@ -7,12 +7,14 @@ class socialProvider with ChangeNotifier{
   List<String> Title = [];
   List<String> Email = [];
   List<String> Password = [];
+  List<String> pointer = [];
   int length = 0;
 
-  void addSocial(String title, email, password){
+  void addSocial(String title, email, password, pt){
     Title.add(title);
     Email.add(email);
     Password.add(password);
+    pointer.add(pt);
     length = Title.length;
     _saveSocial();
     notifyListeners();
@@ -25,6 +27,7 @@ class socialProvider with ChangeNotifier{
     notifyListeners();
     Email.removeAt(index);
     Password.removeAt(index);
+    pointer.removeAt(index);
     notifyListeners();
     _saveSocial();
   }
@@ -34,6 +37,7 @@ class socialProvider with ChangeNotifier{
     prefs.setStringList("SocialTitle", Title);
     prefs.setStringList("SocialEmail", Email);
     prefs.setStringList("SocialPass", Password);
+    prefs.setStringList("SocialPointer", pointer);
     notifyListeners();
   }
 
@@ -43,6 +47,7 @@ class socialProvider with ChangeNotifier{
     Title = prefs.getStringList('SocialTitle')!;
     Email = prefs.getStringList('SocialEmail')!;
     Password = prefs.getStringList('SocialPass')!;
+    pointer = prefs.getStringList('SocialPointer')!;
     length = Title.length;
     notifyListeners();
   }

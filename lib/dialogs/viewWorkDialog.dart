@@ -45,11 +45,11 @@ class _viewWorkDialogState extends State<viewWorkDialog> {
                   children: [
                     const Icon(Icons.email),
                     Expanded(
-                      child: AutoSizeText(" : ${context.watch<workProvider>().Email[widget.index]}", maxLines: 1,),
+                      child: AutoSizeText(" : ${context.read<workProvider>().Email[widget.index]}", maxLines: 1,),
                     ),
                     IconButton(
                         onPressed: (){
-                          Clipboard.setData(ClipboardData(text: context.watch<workProvider>().Email[widget.index]));
+                          Clipboard.setData(ClipboardData(text: context.read<workProvider>().Email[widget.index]));
                           Fluttertoast.showToast(msg: "Email Copied!");
                         },
                         icon: Image.asset("assets/images/copyicon.png", width: 25, height: 25,)
@@ -65,7 +65,7 @@ class _viewWorkDialogState extends State<viewWorkDialog> {
                     ),
                     IconButton(
                         onPressed: (){
-                          Clipboard.setData(ClipboardData(text: context.watch<workProvider>().Password[widget.index]));
+                          Clipboard.setData(ClipboardData(text: context.read<workProvider>().Password[widget.index]));
                           Fluttertoast.showToast(msg: "Password Copied");
                         },
                         icon: Image.asset("assets/images/copyicon.png", width: 25, height: 25,))

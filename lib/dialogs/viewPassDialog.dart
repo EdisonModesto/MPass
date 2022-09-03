@@ -52,7 +52,7 @@ class _viewPassDialogState extends State<viewPassDialog> {
                     ),
                     IconButton(
                         onPressed: (){
-                          Clipboard.setData(ClipboardData(text: context.watch<allPassProvider>().Email[widget.index]));
+                          Clipboard.setData(ClipboardData(text: context.read<allPassProvider>().Email[widget.index]));
                           Fluttertoast.showToast(msg: "Email Copied!");
                         },
                         icon: Image.asset("assets/images/copyicon.png", width: 25, height: 25,)
@@ -68,7 +68,7 @@ class _viewPassDialogState extends State<viewPassDialog> {
                     ),
                     IconButton(
                         onPressed: (){
-                          Clipboard.setData(ClipboardData(text: context.watch<allPassProvider>().Password[widget.index]));
+                          Clipboard.setData(ClipboardData(text: context.read<allPassProvider>().Password[widget.index]));
                           Fluttertoast.showToast(msg: "Password Copied");
                         },
                         icon: Image.asset("assets/images/copyicon.png", width: 25, height: 25,))

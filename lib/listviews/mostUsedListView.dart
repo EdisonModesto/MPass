@@ -31,7 +31,7 @@ class _mostUsedListViewState extends State<mostUsedListView> {
 
         trailing: IconButton(
           onPressed: () {
-            Clipboard.setData(ClipboardData(text: context.watch<allPassProvider>().Password[widget.index]));
+            Clipboard.setData(ClipboardData(text: context.read<allPassProvider>().Password[widget.index]));
             Fluttertoast.showToast(msg: "Password Copied!");
           },
           icon: Image.asset("assets/images/copyicon.png"),

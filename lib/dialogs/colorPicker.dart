@@ -54,32 +54,52 @@ class _customColorPickerState extends State<customColorPicker> {
           decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(15))
           ),
-          child: GridView.count(
-            shrinkWrap: true,
-            crossAxisCount: 4,
-            crossAxisSpacing: 10.0,
-            mainAxisSpacing: 8.0,
-            children: List.generate(ColorObject.primary.length, (index){
-              return Container(
-                decoration: BoxDecoration(
-                  color: ColorObject.primary[index],
-                  borderRadius: BorderRadius.all(Radius.circular(10))
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                  "Pick a Color",
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold
                 ),
-                
-                child: TextButton(
-                  onPressed: () {
-                    _writePref(index);
-                    context.read<colorProvider>().setColor(index);
-                    //Fluttertoast.showToast(msg: index.toString() + " $chosenColor");
+              ),
+              Expanded(
+                flex: 1,
+                child: GridView.count(
+                  padding: const EdgeInsets.only(top: 15, bottom: 15),
+                  shrinkWrap: true,
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 10.0,
+                  mainAxisSpacing: 8.0,
+                  children: List.generate(ColorObject.primary.length, (index){
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: ColorObject.primary[index],
+                        borderRadius: const BorderRadius.all(const Radius.circular(10))
+                      ),
 
+                      child: TextButton(
+                        onPressed: () {
+                          _writePref(index);
+                          context.read<colorProvider>().setColor(index);
+                          //Fluttertoast.showToast(msg: index.toString() + " $chosenColor");
+
+                        },
+                        child: const Text("", style: const TextStyle(color: Colors.white),),
+                      ),
+                    );
+                  })
+                ),
+              ),
+              ElevatedButton(
+                  onPressed: (){
+                    Navigator.pop(context);
                   },
-                  child: Text("", style: TextStyle(color: Colors.white),),
-                ),
-              );
-            })
+                  child: const Text("Done")
+              ),
+            ],
           ),
-          
-
         ),
       ),
     );

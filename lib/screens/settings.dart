@@ -7,9 +7,13 @@ import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mpass/dialogs/category.dart';
 import 'package:mpass/dialogs/colorPicker.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:slider_button/slider_button.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
+import '../colors/AppColors.dart';
+import '../providers/colors.dart';
 
 class Settings extends StatefulWidget{
   @override
@@ -17,6 +21,9 @@ class Settings extends StatefulWidget{
 }
 
 class _settings extends State<Settings>{
+  final AppColors ColorObject = AppColors();
+  int currColor = 0;
+
 
   List<String> settingsLbl = [ "Appearance", "Categories", "Scan Settings", "Backup Settings","Privacy and Policy"];
   
@@ -39,11 +46,14 @@ class _settings extends State<Settings>{
   @override
   void initState() {
     _getScanMode();
+
+    context.read<colorProvider>().initColor();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    currColor = context.watch<colorProvider>().colorIndex;
     return SafeArea(
       child: Stack(
         children: [
@@ -313,7 +323,7 @@ class _settings extends State<Settings>{
                               margin: const EdgeInsets.only(top: 15, bottom: 15),
                               width: MediaQuery.of(context).size.width * 0.01,
                               decoration: BoxDecoration(
-                                  color: const Color(0xffBAABDA),
+                                  color: ColorObject.accent[currColor],
                                   borderRadius: BorderRadius.circular(15)
                               ),
                             ),

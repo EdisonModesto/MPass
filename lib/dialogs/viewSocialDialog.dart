@@ -49,7 +49,7 @@ class _viewSocialDialogState extends State<viewSocialDialog> {
                     ),
                     IconButton(
                         onPressed: (){
-                          Clipboard.setData(ClipboardData(text: context.watch<socialProvider>().Email[widget.index]));
+                          Clipboard.setData(ClipboardData(text: context.read<socialProvider>().Email[widget.index]));
                           Fluttertoast.showToast(msg: "Email Copied!");
                         },
                         icon: Image.asset("assets/images/copyicon.png", width: 25, height: 25,)
@@ -65,7 +65,7 @@ class _viewSocialDialogState extends State<viewSocialDialog> {
                     ),
                     IconButton(
                         onPressed: (){
-                          Clipboard.setData(ClipboardData(text: context.watch<socialProvider>().Password[widget.index]));
+                          Clipboard.setData(ClipboardData(text: context.read<socialProvider>().Password[widget.index]));
                           Fluttertoast.showToast(msg: "Password Copied");
                         },
                         icon: Image.asset("assets/images/copyicon.png", width: 25, height: 25,))

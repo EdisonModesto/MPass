@@ -449,7 +449,7 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
     _checkIdentical()async{
 
       Timer(const Duration(seconds: 1), () async{
-        List<String> temp = context.watch<allPassProvider>().Password;
+        List<String> temp = context.read<allPassProvider>().Password;
         var removedDupes = temp.toSet().toList();
 
         setState((){
@@ -777,6 +777,8 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                               TextButton(
                                                   onPressed: (){
                                                     context.read<allPassProvider>().addallPass(tempName, _emailCon.text, _passCon.text);
+                                                    _checkBreached();
+                                                    _checkIdentical();
                                                     Navigator.pop(context, true);
                                                   },
 
@@ -831,7 +833,7 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Text(
-                                        _AccDetails.Title.length.toString(),
+                                        context.watch<allPassProvider>().Title.length.toString(),
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 25
@@ -846,7 +848,7 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                               margin: const EdgeInsets.only(top: 15, bottom: 15),
                               width: MediaQuery.of(context).size.width * 0.01,
                               decoration: BoxDecoration(
-                                color: const Color(0xffBAABDA),
+                                color: ColorObject.accent[currColor],
                                 borderRadius: BorderRadius.circular(15)
                               ),
                             ),

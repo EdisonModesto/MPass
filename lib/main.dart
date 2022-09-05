@@ -10,8 +10,10 @@ import 'package:mpass/providers/colors.dart';
 import 'package:mpass/providers/mostUsedProvider.dart';
 import 'package:mpass/providers/searchProvider.dart';
 import 'package:mpass/providers/socialProvider.dart';
+import 'package:mpass/providers/isFirstLaunch.dart';
 import 'package:mpass/screens/generate.dart';
 import 'package:mpass/screens/home.dart';
+import 'package:mpass/screens/onboard.dart';
 import 'package:mpass/screens/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,7 +34,8 @@ void main() async {
         ChangeNotifierProvider(create: (_)=> socialProvider()),
         ChangeNotifierProvider(create: (_)=> workProvider()),
         ChangeNotifierProvider(create: (_)=> mostUsedProvider()),
-        ChangeNotifierProvider(create: (_)=> searchProvider())
+        ChangeNotifierProvider(create: (_)=> searchProvider()),
+        ChangeNotifierProvider(create: (_)=> isFirstLaunch()),
       ],
       child: const MyApp(),
     )
@@ -96,6 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
   AppColors _appColors = new AppColors();
 
   int currColor = 0 ;
+  bool isFirst = true;
 
   @override
   void initState() {
@@ -107,19 +111,20 @@ class _MyHomePageState extends State<MyHomePage> {
     context.read<workProvider>().initWork();
     context.read<mostUsedProvider>().initMostUsed();
     context.read<searchProvider>().initSearch();
+    context.read<isFirstLaunch>().initIsFirst();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    isFirst = context.watch<isFirstLaunch>().isFirst;
 
     currColor = context.watch<colorProvider>().colorIndex;
-
     return Scaffold(
         backgroundColor: _appColors.primary[currColor],
         resizeToAvoidBottomInset: false,
 
-        body: PageView(
+        body: context.watch<isFirstLaunch>().isFirst ? onBoardScreen() : PageView(
           controller: PageController(initialPage: 1),
           children: [
             //Settings

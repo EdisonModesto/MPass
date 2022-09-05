@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lottie/lottie.dart';
 import 'package:mpass/colors/AppColors.dart';
 import 'package:mpass/passwords.dart';
 import 'package:mpass/providers/WorkProvider.dart';
@@ -14,6 +15,7 @@ import 'package:mpass/providers/isFirstLaunch.dart';
 import 'package:mpass/screens/generate.dart';
 import 'package:mpass/screens/home.dart';
 import 'package:mpass/screens/onboard.dart';
+import 'package:mpass/screens/pageView.dart';
 import 'package:mpass/screens/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -93,10 +95,12 @@ class MyHomePage extends StatefulWidget {
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
+  //State<MyHomePage> createState() => splashScreen();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   AppColors _appColors = new AppColors();
+  late final AnimationController _controller;
 
   int currColor = 0 ;
   bool isFirst = true;
@@ -112,32 +116,47 @@ class _MyHomePageState extends State<MyHomePage> {
     context.read<mostUsedProvider>().initMostUsed();
     context.read<searchProvider>().initSearch();
     context.read<isFirstLaunch>().initIsFirst();
+    _controller = AnimationController(vsync: this);
+    _controller.addStatusListener((status) {
+      if(status == AnimationStatus.completed){
+        _controller.reset();
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const pageViewScreen()),);
+      }
+    });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     isFirst = context.watch<isFirstLaunch>().isFirst;
-
+    
     currColor = context.watch<colorProvider>().colorIndex;
-    return Scaffold(
-        backgroundColor: _appColors.primary[currColor],
-        resizeToAvoidBottomInset: false,
+    return SafeArea(
+      child: Center(
+        child: Container(
+          color: Colors.white,
+          width: MediaQuery.of(context).size.width * 1,
+          height: MediaQuery.of(context).size.height * 1,
+          padding: EdgeInsets.all(150),
+          child: Lottie.asset(
+              "assets/lottie/logo.json",
+              repeat: false,
+              controller: _controller,
+              onLoaded: (composition){
+                _controller.duration = composition.duration;
+                _controller.forward().whenComplete(() => (){
 
-        body: context.watch<isFirstLaunch>().isFirst ? onBoardScreen() : PageView(
-          controller: PageController(initialPage: 1),
-          children: [
-            //Settings
-            Settings(),
-
-            //Home
-            Home(),
-
-            //Generate
-            Generate()
-
-          ],
-        )
-      );
+                });
+              }
+          ),
+        ),
+      ),
+    );
   }
 }

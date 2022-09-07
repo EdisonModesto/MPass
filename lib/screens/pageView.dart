@@ -1,7 +1,15 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:mpass/backup/writeClass.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+
 import 'package:flutter/material.dart';
 import 'package:mpass/screens/settings.dart';
 import 'package:provider/provider.dart';
 
+import '../backup/classPass.dart';
 import '../colors/AppColors.dart';
 import '../providers/colors.dart';
 import '../providers/isFirstLaunch.dart';
@@ -10,16 +18,20 @@ import 'home.dart';
 import 'onboard.dart';
 
 class pageViewScreen extends StatefulWidget {
+
   const pageViewScreen({Key? key}) : super(key: key);
+
 
   @override
   State<pageViewScreen> createState() => _pageViewScreenState();
 }
 
 class _pageViewScreenState extends State<pageViewScreen> {
+
   AppColors _appColors = new AppColors();
   late final AnimationController _controller;
 
+  List<Person> people = [];
   int currColor = 0 ;
   bool isFirst = true;
 
@@ -52,4 +64,6 @@ class _pageViewScreenState extends State<pageViewScreen> {
         )
     );
   }
+
+
 }

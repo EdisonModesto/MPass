@@ -143,7 +143,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
           color: Colors.white,
           width: MediaQuery.of(context).size.width * 1,
           height: MediaQuery.of(context).size.height * 1,
-          padding: EdgeInsets.all(150),
+          padding: EdgeInsets.all(125),
           child: Lottie.asset(
               "assets/lottie/logo.json",
               repeat: false,

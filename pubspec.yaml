@@ -46,6 +46,10 @@ dependencies:
   lottie: ^1.4.2
   provider: ^6.0.3
   introduction_screen: ^3.0.2
+  path_provider: ^2.0.1 # to get the correct path to store our file
+  permission_handler: ^8.0.0+1 # to handle the permissions to read and write files
+  share: ^2.0.1 # to share the file that we create
+  file_picker: ^3.0.1 # to import the file that we saved
 
 dev_dependencies:
   flutter_test:

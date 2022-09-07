@@ -5,6 +5,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mpass/dialogs/backupDialog.dart';
 import 'package:mpass/dialogs/category.dart';
 import 'package:mpass/dialogs/colorPicker.dart';
 import 'package:provider/provider.dart';
@@ -195,11 +196,16 @@ class _settings extends State<Settings>{
                                     ),
                                   )
                               ),
+                              //Backup Tile
                               SizedBox(
                                   width: MediaQuery.of(context).size.width * 1,
                                   height: 50,
                                   child: TextButton(
-                                    onPressed: () {  },
+                                    onPressed: () {
+                                      showDialog(context: context, builder: (BuildContext context){
+                                        return backupDialog();
+                                      });
+                                    },
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [

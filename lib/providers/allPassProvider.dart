@@ -16,6 +16,32 @@ class allPassProvider with ChangeNotifier{
     notifyListeners();
   }
 
+  void restore(T, E, P){
+    List<String> tStr = List<String>.from(T);
+    List<String> eStr = List<String>.from(E);
+    List<String> pStr = List<String>.from(P);
+    Title.clear();
+    Email.clear();
+    Password.clear();
+    isSocial.clear();
+    isWork.clear();
+    length = 0;
+
+    Title.addAll(tStr);
+    Email.addAll(eStr);
+    Password.addAll(pStr);
+    isWork = List.filled(Title.length, "0", growable: true);
+    isSocial = List.filled(Title.length, "0", growable: true);
+    length = Title.length;
+    notifyListeners();
+    _saveallPass();
+    print(tStr);
+    print(eStr);
+    print(pStr);
+    print("Saved");
+
+  }
+
   void delSocial(int index){
     isSocial[index] = "0";
     notifyListeners();

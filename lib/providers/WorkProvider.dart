@@ -32,6 +32,15 @@ class workProvider with ChangeNotifier{
     notifyListeners();
   }
 
+  void restore(){
+    Title.clear();
+    Email.clear();
+    Password.clear();
+    pointer.clear();
+    length = 0;
+    _saveWork();
+  }
+
   void _saveWork()async{
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList("WorkTitle", Title);

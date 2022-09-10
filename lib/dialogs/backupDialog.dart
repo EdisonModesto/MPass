@@ -4,7 +4,10 @@ import 'dart:io';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mpass/dialogs/loader.dart';
+import 'package:mpass/providers/WorkProvider.dart';
 import 'package:mpass/providers/allPassProvider.dart';
+import 'package:mpass/providers/socialProvider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -185,9 +188,15 @@ class _backupDialogState extends State<backupDialog> {
                                             children: [
                                               TextButton(onPressed: (){Navigator.pop(context);}, child: const Text("Close", style: TextStyle(color: Colors.grey))),
                                               TextButton(onPressed: (){
-                                                Navigator.pop(context);
-                                                context.read<allPassProvider>().restore(backupAccount[index][1], backupAccount[index][2], backupAccount[index][3]);
-                                                Fluttertoast.showToast(msg: "Backup has been restored");
+                                                showDialog(context: context, builder: (BuildContext context){
+                                                  return const Loader();
+                                                }).then((value) => {
+                                                    context.read<allPassProvider>().restore(backupAccount[index][1], backupAccount[index][2], backupAccount[index][3]),
+                                                    context.read<socialProvider>().restore(),
+                                                    context.read<workProvider>().restore(),
+                                                    Fluttertoast.showToast(msg: "Backup has been restored"),
+                                                    Navigator.pop(context),
+                                                });
                                                 }, child: const Text("Restore", style: TextStyle(color: Colors.redAccent),))
                                             ],
                                           )
@@ -211,7 +220,13 @@ class _backupDialogState extends State<backupDialog> {
 
               ElevatedButton(
                 onPressed: (){
-                  writeToFile("hello", "1");
+                  showDialog(context: context, builder: (BuildContext context){
+                    return const Loader();
+                  }).then((value) => {
+                    writeToFile("hello", "1"),
+                    Fluttertoast.showToast(msg: "Backup was created")
+                  });
+
                 },
                 child: const Text("Create new Backup"),
               ),

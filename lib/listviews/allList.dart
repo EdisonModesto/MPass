@@ -32,6 +32,7 @@ class _allListState extends State<allList> {
         trailing: IconButton(
           onPressed: () {
             Clipboard.setData(ClipboardData(text: context.read<allPassProvider>().Password[widget.index]));
+            context.read<allPassProvider>().addTap(widget.index);
             Fluttertoast.showToast(msg: "Password Copied!");
           },
           icon: Image.asset("assets/images/copyicon.png"),

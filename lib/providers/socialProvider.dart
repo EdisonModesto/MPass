@@ -32,6 +32,15 @@ class socialProvider with ChangeNotifier{
     _saveSocial();
   }
 
+  void restore(){
+    Title.clear();
+    Email.clear();
+    Password.clear();
+    pointer.clear();
+    length = 0;
+    _saveSocial();
+  }
+
   void _saveSocial()async{
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList("SocialTitle", Title);

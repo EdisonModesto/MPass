@@ -15,6 +15,13 @@ class mostUsedListView extends StatefulWidget {
 }
 
 class _mostUsedListViewState extends State<mostUsedListView> {
+
+  @override
+  void initState() {
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -31,7 +38,7 @@ class _mostUsedListViewState extends State<mostUsedListView> {
 
         trailing: IconButton(
           onPressed: () {
-            Clipboard.setData(ClipboardData(text: context.read<allPassProvider>().Password[widget.index]));
+            Clipboard.setData(ClipboardData(text: context.read<allPassProvider>().mPassword[widget.index]));
             Fluttertoast.showToast(msg: "Password Copied!");
           },
           icon: Image.asset("assets/images/copyicon.png"),
@@ -45,11 +52,11 @@ class _mostUsedListViewState extends State<mostUsedListView> {
             children: [
               Text(
 
-                context.watch<allPassProvider>().Title[widget.index],
+                context.watch<allPassProvider>().mTitle[widget.index],
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               AutoSizeText(
-                context.watch<allPassProvider>().Email[widget.index],
+                context.watch<allPassProvider>().mEmail[widget.index],
                 //_Emails![index],
                 style: const TextStyle(fontSize: 14),
                 maxLines: 1,
@@ -57,6 +64,6 @@ class _mostUsedListViewState extends State<mostUsedListView> {
             ],
           ),
         )
-    );
+    ) ;
   }
 }

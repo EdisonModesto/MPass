@@ -7,6 +7,7 @@ import 'package:mpass/colors/AppColors.dart';
 import 'package:mpass/compromised.dart';
 import 'package:mpass/dialogs/viewPassDialog.dart';
 import 'package:mpass/listviews/allList.dart';
+import 'package:mpass/listviews/mostUsedListView.dart';
 import 'package:mpass/listviews/searchListView.dart';
 import 'package:mpass/listviews/socialListView.dart';
 import 'package:mpass/listviews/workListView.dart';
@@ -668,27 +669,19 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                           child: Container(
                             margin: const EdgeInsets.only(top: 10, bottom: 10),
                             child: ListView.builder(
-                              itemCount: _catSelected[0] ? context.watch<allPassProvider>().length : _catSelected[1] ? context.watch<mostUsedProvider>().length : _catSelected[2] ? context.watch<socialProvider>().length : _catSelected[3] ? context.watch<workProvider>().length : context.watch<searchProvider>().length,
+                              itemCount: _catSelected[0] ? context.watch<allPassProvider>().length : _catSelected[1] ? context.watch<allPassProvider>().mTitle.length : _catSelected[2] ? context.watch<socialProvider>().length : _catSelected[3] ? context.watch<workProvider>().length : context.watch<searchProvider>().length,
                                 itemBuilder: (BuildContext context, int index){
                                 return Container(
                                     width: MediaQuery.of(context).size.width * 1,
                                     margin: const EdgeInsets.only(bottom: 20),
                                     height: 50,
-                                    child: _catSelected[0] ? allList(index: index) : _catSelected[1] ? Text("most used") : _catSelected[2] ? socialListView(index: index) : _catSelected[3] ? workListView(index: index) : searchListView(index: index)
-
-
-
+                                    child: _catSelected[0] ? allList(index: index) : _catSelected[1] ? mostUsedListView(index: index): _catSelected[2] ? socialListView(index: index) : _catSelected[3] ? workListView(index: index) : searchListView(index: index)
                                   );
-
-
                               },
                               shrinkWrap: true,
                               padding: const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 5),
-
                             ) ,
-
                           )
-
                       ),
 
                       //Add button

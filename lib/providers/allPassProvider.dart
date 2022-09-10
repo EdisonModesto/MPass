@@ -9,7 +9,15 @@ class allPassProvider with ChangeNotifier{
   List<String> Password = [];
   List<String> isSocial = [];
   List<String> isWork = [];
+  List<String> tapCount = [];
   int length = 0;
+
+  //most used
+  List<String> mTitle = [];
+  List<String> mEmail = [];
+  List<String> mPassword = [];
+  List<String> misSocial = [];
+  List<String> mtapCount = [];
 
   void addSocial(int index){
     isSocial[index] = "1";
@@ -25,6 +33,7 @@ class allPassProvider with ChangeNotifier{
     Password.clear();
     isSocial.clear();
     isWork.clear();
+    tapCount.clear();
     length = 0;
 
     Title.addAll(tStr);
@@ -32,6 +41,7 @@ class allPassProvider with ChangeNotifier{
     Password.addAll(pStr);
     isWork = List.filled(Title.length, "0", growable: true);
     isSocial = List.filled(Title.length, "0", growable: true);
+    tapCount = List.filled(Title.length, "0", growable: true);
     length = Title.length;
     notifyListeners();
     _saveallPass();
@@ -40,6 +50,17 @@ class allPassProvider with ChangeNotifier{
     print(pStr);
     print("Saved");
 
+  }
+
+  void addTap(int index){
+    tapCount[index] = (int.parse(tapCount[index]) + 1).toString();
+    if(int.parse(tapCount[index]) > 2 && int.parse(tapCount[index]) <= 3){
+      mTitle.add(Title[index]);
+      mEmail.add(Email[index]);
+      mPassword.add(Email[index]);
+    }
+    _saveallPass();
+    notifyListeners();
   }
 
   void delSocial(int index){
@@ -64,6 +85,7 @@ class allPassProvider with ChangeNotifier{
     Password.add(password);
     isSocial.add("0");
     isWork.add("0");
+    tapCount.add("0");
     notifyListeners();
     _saveallPass();
   }
@@ -75,6 +97,7 @@ class allPassProvider with ChangeNotifier{
     prefs.setStringList("Passwords", Password);
     prefs.setStringList("isSocial", isSocial);
     prefs.setStringList("isWork", isWork);
+    prefs.setStringList("tapCount", tapCount);
     notifyListeners();
   }
 
@@ -87,8 +110,13 @@ class allPassProvider with ChangeNotifier{
     Password.removeAt(index);
     isWork.removeAt(index);
     isSocial.removeAt(index);
-    notifyListeners();
+    tapCount.removeAt(index);
+    mTitle.clear();
+    mEmail.clear();
+    mPassword.clear();
     _saveallPass();
+    initallPass();
+    notifyListeners();
   }
 
   void initallPass()async{
@@ -98,7 +126,16 @@ class allPassProvider with ChangeNotifier{
     Password = prefs.getStringList('Passwords')!;
     isSocial = prefs.getStringList("isSocial")!;
     isWork = prefs.getStringList("isWork")!;
+    tapCount = prefs.getStringList("tapCount")!;
     length = Title.length;
+
+    for(int i = 0; i < length; i++){
+      if(int.parse(tapCount[i]) > 2){
+        mTitle.add(Title[i]);
+        mEmail.add(Email[i]);
+        mPassword.add(Email[i]);
+      }
+    }
 
     notifyListeners();
   }

@@ -7,13 +7,15 @@ class mostUsedProvider with ChangeNotifier{
   List<String> Title = [];
   List<String> Email = [];
   List<String> Password = [];
-
+  List<String> pointer = [];
   int length = 0;
 
-  void addallMostUsed(String title, email, password){
+  void addallMostUsed(String title, email, password, pt){
     Title.add(title);
     Email.add(email);
     Password.add(password);
+    pointer.add(pt);
+    length = Title.length;
     _saveMostUsed();
     notifyListeners();
   }
@@ -34,6 +36,4 @@ class mostUsedProvider with ChangeNotifier{
     Password = prefs.getStringList('MostUsedPass')!;
     notifyListeners();
   }
-
-
 }

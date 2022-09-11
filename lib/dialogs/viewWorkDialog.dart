@@ -45,7 +45,7 @@ class _viewWorkDialogState extends State<viewWorkDialog> {
                   children: [
                     const Icon(Icons.email),
                     Expanded(
-                      child: AutoSizeText(" : ${context.read<workProvider>().Email[widget.index]}", maxLines: 1,),
+                      child: AutoSizeText(" : ${context.read<workProvider>().Email[widget.index]}", maxLines: 1, minFontSize: 6,),
                     ),
                     IconButton(
                         onPressed: (){
@@ -61,7 +61,7 @@ class _viewWorkDialogState extends State<viewWorkDialog> {
                   children: [
                     const Icon(Icons.password),
                     Expanded(
-                      child: Text(" : ${context.watch<workProvider>().Password[widget.index]}"),
+                      child: AutoSizeText(" : ${context.watch<workProvider>().Password[widget.index]}", maxLines: 1, minFontSize: 6,),
                     ),
                     IconButton(
                         onPressed: (){

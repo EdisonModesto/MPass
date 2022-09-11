@@ -45,7 +45,7 @@ class _viewSocialDialogState extends State<viewSocialDialog> {
                   children: [
                     const Icon(Icons.email),
                     Expanded(
-                      child: AutoSizeText(" : ${context.watch<socialProvider>().Email[widget.index]}", maxLines: 1,),
+                      child: AutoSizeText(" : ${context.watch<socialProvider>().Email[widget.index]}", maxLines: 1, minFontSize: 6,),
                     ),
                     IconButton(
                         onPressed: (){
@@ -61,7 +61,7 @@ class _viewSocialDialogState extends State<viewSocialDialog> {
                   children: [
                     const Icon(Icons.password),
                     Expanded(
-                      child: Text(" : ${context.watch<socialProvider>().Password[widget.index]}"),
+                      child: AutoSizeText(" : ${context.watch<socialProvider>().Password[widget.index]}", minFontSize: 6, maxLines: 1,),
                     ),
                     IconButton(
                         onPressed: (){

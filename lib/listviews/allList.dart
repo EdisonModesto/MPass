@@ -44,10 +44,10 @@ class _allListState extends State<allList> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(
-
+              AutoSizeText(
                 context.watch<allPassProvider>().Title[widget.index],
                 style: const TextStyle(fontWeight: FontWeight.bold),
+                maxLines: 1,
               ),
               AutoSizeText(
                 context.watch<allPassProvider>().Email[widget.index],

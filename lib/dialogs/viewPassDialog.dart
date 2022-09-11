@@ -48,7 +48,11 @@ class _viewPassDialogState extends State<viewPassDialog> {
                   children: [
                     const Icon(Icons.email),
                     Expanded(
-                      child: AutoSizeText(" : ${context.watch<allPassProvider>().Email[widget.index]}", maxLines: 1,),
+                      child: AutoSizeText(
+                        " : ${context.watch<allPassProvider>().Email[widget.index]}",
+                        maxLines: 1,
+                        minFontSize: 6,
+                      ),
                     ),
                     IconButton(
                         onPressed: (){
@@ -64,7 +68,11 @@ class _viewPassDialogState extends State<viewPassDialog> {
                   children: [
                     const Icon(Icons.password),
                     Expanded(
-                      child: Text(" : ${context.watch<allPassProvider>().Password[widget.index]}"),
+                      child: AutoSizeText(
+                        " : ${context.watch<allPassProvider>().Password[widget.index]}",
+                        maxLines: 1,
+                        minFontSize: 6,
+                      ),
                     ),
                     IconButton(
                         onPressed: (){

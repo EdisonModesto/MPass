@@ -5,6 +5,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fadein/flutter_fadein.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lottie/lottie.dart';
 import 'package:mpass/dialogs/backupDialog.dart';
 import 'package:mpass/dialogs/category.dart';
 import 'package:mpass/dialogs/colorPicker.dart';
@@ -49,6 +50,7 @@ class _settings extends State<Settings>{
     _getScanMode();
 
     context.read<colorProvider>().initColor();
+    if (Platform.isAndroid) WebView.platform = AndroidWebView();
     super.initState();
   }
 
@@ -119,7 +121,7 @@ class _settings extends State<Settings>{
                               child: TextButton(
                                 onPressed: () {
                                   showDialog(context: context, builder: (BuildContext context){
-                                    return customColorPicker();
+                                    return const customColorPicker();
                                   });
                                 },
                                 child: Row(
@@ -149,7 +151,7 @@ class _settings extends State<Settings>{
                                   child: TextButton(
                                     onPressed: () {
                                       showDialog(context: context, builder: (BuildContext context){
-                                        return catDialog();
+                                        return const catDialog();
                                       });
                                     },
                                     child: Row(
@@ -203,7 +205,7 @@ class _settings extends State<Settings>{
                                   child: TextButton(
                                     onPressed: () {
                                       showDialog(context: context, builder: (BuildContext context){
-                                        return backupDialog();
+                                        return const backupDialog();
                                       });
                                     },
                                     child: Row(
@@ -285,24 +287,64 @@ class _settings extends State<Settings>{
 
                                     onPressed: () {
                                       showDialog(context: context, builder: (BuildContext context){
-                                        return Center(
-                                          child: Card(
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(Radius.circular(15))
-                                            ),
-                                            child: SizedBox(
-                                              height: 500,
-                                              width: MediaQuery.of(context).size.width * 0.8,
-                                              child: const ClipRRect(
-                                                borderRadius: BorderRadius.all(Radius.circular(15)),
-                                                child: WebView(
-                                                  initialUrl: "https://ko-fi.com/edisonmodesto",
-                                                  javascriptMode: JavascriptMode.unrestricted,
+                                        double diaHeight = 300;
+                                        bool lottieVis = true;
+                                        return StatefulBuilder(
+                                        builder: (context, setState) {
+                                          return Center(
+                                              child: Card(
+                                                shape: const RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius
+                                                        .all(Radius.circular(15))
+                                                ),
+                                                child: AnimatedContainer(
+                                                  height: diaHeight,
+                                                  width: MediaQuery.of(context).size.width * 0.8,
+                                                  duration: Duration(milliseconds: 100),
+                                                  child: ClipRRect(
+                                                    borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                    child: Stack(
+                                                      children: [
+                                                         Visibility(
+                                                          visible: true,
+                                                          child: WebView(
+                                                            initialUrl: "https://ko-fi.com/edisonmodesto",
+                                                            javascriptMode: JavascriptMode.unrestricted,
+
+                                                            onProgress: (value){
+                                                              if(value == 70){
+                                                                print("expanding");
+                                                                setState((){
+                                                                  lottieVis = false;
+                                                                  diaHeight = 600;
+                                                                });
+                                                              }
+                                                            },
+
+                                                            onPageFinished: (finish){
+                                                              print("loaded");
+                                                              setState((){
+                                                                lottieVis = false;
+                                                                diaHeight = 600;
+                                                              });
+                                                            },
+                                                          ),
+                                                        ),
+                                                        Center(
+                                                          child: Visibility(
+                                                            visible: lottieVis,
+                                                            child: LottieBuilder.asset(
+                                                                "assets/lottie/loader.json"
+                                                            ),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    )
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ) ,
-                                        );
+                                            );
+                                          });
                                       });
                                     },
                                     child: Row(
@@ -338,18 +380,79 @@ class _settings extends State<Settings>{
                               child: Center(
                                   child: TextButton(
 
-                                    onPressed: () {  },
+                                    onPressed: () {
+                                      showDialog(context: context, builder: (BuildContext context){
+                                        double diaHeight = 300;
+                                        bool lottieVis = true;
+                                        return StatefulBuilder(
+                                        builder: (context, setState) {
+                                          return Center(
+                                            child: Card(
+                                              shape: const RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(Radius.circular(15))
+                                              ),
+                                              child: AnimatedContainer(
+                                                height: diaHeight,
+                                                width: MediaQuery.of(context).size.width * 0.85,
+                                                duration: const Duration(milliseconds: 100),
+                                                child: ClipRRect(
+                                                    borderRadius: const BorderRadius.all(const Radius.circular(15)),
+                                                    child: Stack(
+                                                      
+                                                      children: [
+                                                        Visibility(
+                                                          visible: true,
+                                                          child: WebView(
+                                                              initialUrl: "https://devtastic.tech/blogposts/passmanager",
+                                                              javascriptMode: JavascriptMode.disabled,
+
+                                                              onProgress: (value){
+                                                                if(value == 70){
+                                                                  print("expanding");
+                                                                  setState((){
+                                                                    lottieVis = false;
+                                                                    diaHeight = 600;
+                                                                  });
+                                                                }
+                                                              },
+
+                                                              onPageFinished: (finish){
+                                                                print("loaded");
+                                                                setState((){
+                                                                  lottieVis = false;
+                                                                  diaHeight = 600;
+                                                                });
+                                                              },
+                                                          ),
+                                                        ),
+                                                        Center(
+                                                          child: Visibility(
+                                                            visible: lottieVis,
+                                                            child: LottieBuilder.asset(
+                                                                "assets/lottie/loader.json"
+                                                            ),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    )
+
+                                                ),
+                                              ),
+                                            ) ,
+                                          );
+                                        });
+                                      });
+                                    },
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Image.asset(
-                                          "assets/images/settingsIcon.png",
-                                          width: 30,
-                                          height: 35,
-
+                                      children: const [
+                                        Icon(
+                                            Icons.password_outlined,
+                                          size: 35,
+                                          color: Colors.black87,
                                         ),
-                                        const Text(
-                                          "Advanced\nSettings",
+                                        Text(
+                                          "Why\nuse MPass?",
                                           style: TextStyle(
                                               color: Color(0xff000000)
                                           ),

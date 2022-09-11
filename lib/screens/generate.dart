@@ -318,7 +318,10 @@ class _generate extends State<Generate>{
                               child: Center(
                                 child: TextButton(
 
-                                  onPressed: () {  },
+
+                                  onPressed: () {
+                                    Fluttertoast.showToast(msg: "Coming Soon!");
+                                  },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [

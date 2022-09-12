@@ -2,6 +2,9 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mpass/categories/work.dart';
+import 'package:mpass/providers/WorkProvider.dart';
+import 'package:mpass/providers/socialProvider.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/allPassProvider.dart';
@@ -88,7 +91,22 @@ class _viewPassDialogState extends State<viewPassDialog> {
                     TextButton(
                         onPressed: (){
                           Navigator.pop(context);
-                          Fluttertoast.showToast(msg: "Account Removed");
+
+                          for(int i = 0; i < context.read<socialProvider>().pointer.length; i++){
+                            //print("${context.read<socialProvider>().pointer[i] } and ${context.read<allPassProvider>().KeyList[widget.index]}");
+                            if(context.read<socialProvider>().pointer[i] == context.read<allPassProvider>().KeyList[widget.index]){
+                              context.read<allPassProvider>().delSocial(widget.index);
+                              context.read<socialProvider>().deleteAllPass(i);
+                            }
+                          }
+
+                          for(int i = 0; i < context.read<workProvider>().pointer.length; i++){
+                            if(context.read<workProvider>().pointer[i] == context.read<allPassProvider>().KeyList[widget.index]){
+                              context.read<allPassProvider>().delWork(widget.index);
+                              context.read<workProvider>().deleteAllPass(i);
+                            }
+                          }
+
                           context.read<allPassProvider>().deleteAllPass(widget.index);
                           Fluttertoast.showToast(msg: "Account Removed");
                         },

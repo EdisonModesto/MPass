@@ -769,12 +769,15 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                                               ),
                                               TextButton(
                                                   onPressed: (){
-                                                    context.read<allPassProvider>().addallPass(tempName, _emailCon.text, _passCon.text);
+                                                    DateTime now = new DateTime.now();
+                                                    DateTime date = new DateTime(now.year, now.month, now.day, now.hour,now.minute,now.second);
+                                                    String keystr = date.toString();
+
+                                                    context.read<allPassProvider>().addallPass(tempName, _emailCon.text, _passCon.text, keystr);
                                                     _checkBreached();
                                                     _checkIdentical();
                                                     Navigator.pop(context, true);
                                                   },
-
                                                   child: const Text("Add")
                                               ),
                                             ],

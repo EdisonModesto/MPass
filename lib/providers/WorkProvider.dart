@@ -46,7 +46,7 @@ class workProvider with ChangeNotifier{
     prefs.setStringList("WorkTitle", Title);
     prefs.setStringList("WorkEmail", Email);
     prefs.setStringList("WorkPass", Password);
-    prefs.setStringList("isWork", pointer);
+    prefs.setStringList("workKey", pointer);
     notifyListeners();
   }
 
@@ -56,7 +56,7 @@ class workProvider with ChangeNotifier{
     Title = prefs.getStringList('WorkTitle')!;
     Email = prefs.getStringList('WorkEmail')!;
     Password = prefs.getStringList('WorkPass')!;
-    pointer = prefs.getStringList("isWork")!;
+    pointer = prefs.getStringList("workKey")!;
     length = Title.length;
     notifyListeners();
   }

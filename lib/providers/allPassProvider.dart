@@ -7,6 +7,7 @@ class allPassProvider with ChangeNotifier{
   List<String> Title = [];
   List<String> Email = [];
   List<String> Password = [];
+  List<String> KeyList = [];
   List<String> isSocial = [];
   List<String> isWork = [];
   List<String> tapCount = [];
@@ -33,6 +34,7 @@ class allPassProvider with ChangeNotifier{
     Password.clear();
     isSocial.clear();
     isWork.clear();
+    KeyList.clear();
     tapCount.clear();
     length = 0;
 
@@ -78,13 +80,14 @@ class allPassProvider with ChangeNotifier{
     notifyListeners();
   }
 
-  void addallPass(String title, email, password){
+  void addallPass(String title, email, password, key){
     Title.add(title);
     length = Title.length;
     Email.add(email);
     Password.add(password);
     isSocial.add("0");
     isWork.add("0");
+    KeyList.add(key);
     tapCount.add("0");
     notifyListeners();
     _saveallPass();
@@ -97,6 +100,7 @@ class allPassProvider with ChangeNotifier{
     prefs.setStringList("Passwords", Password);
     prefs.setStringList("isSocial", isSocial);
     prefs.setStringList("isWork", isWork);
+    prefs.setStringList("Key", KeyList);
     prefs.setStringList("tapCount", tapCount);
     notifyListeners();
   }
@@ -110,6 +114,7 @@ class allPassProvider with ChangeNotifier{
     Password.removeAt(index);
     isWork.removeAt(index);
     isSocial.removeAt(index);
+    KeyList.removeAt(index);
     tapCount.removeAt(index);
     mTitle.clear();
     mEmail.clear();
@@ -126,6 +131,7 @@ class allPassProvider with ChangeNotifier{
     Password = prefs.getStringList('Passwords')!;
     isSocial = prefs.getStringList("isSocial")!;
     isWork = prefs.getStringList("isWork")!;
+    KeyList = prefs.getStringList("Key")!;
     tapCount = prefs.getStringList("tapCount")!;
     length = Title.length;
 

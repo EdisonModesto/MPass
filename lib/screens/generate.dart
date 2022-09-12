@@ -308,7 +308,10 @@ class _generate extends State<Generate>{
                                                                                   ),
                                                                                   TextButton(
                                                                                       onPressed: (){
-                                                                                        context.read<allPassProvider>().addallPass(tempName, _emailCon.text, _passCon.text);
+                                                                                        DateTime now = new DateTime.now();
+                                                                                        DateTime date = new DateTime(now.year, now.month, now.day, now.hour,now.minute,now.second);
+                                                                                        String keystr = date.toString();
+                                                                                        context.read<allPassProvider>().addallPass(tempName, _emailCon.text, _passCon.text, keystr);
                                                                                         Navigator.pop(context, true);
                                                                                       },
 

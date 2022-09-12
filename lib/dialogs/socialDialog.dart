@@ -162,7 +162,7 @@ class _socialDialogState extends State<socialDialog> {
                                           trailing: IconButton(
                                             onPressed: () {
                                               if(context.read<allPassProvider>().isSocial[index] == "0") {
-                                                context.read<socialProvider>().addSocial(context.read<allPassProvider>().Title[index], context.read<allPassProvider>().Email[index], context.read<allPassProvider>().Password[index], index.toString());
+                                                context.read<socialProvider>().addSocial(context.read<allPassProvider>().Title[index], context.read<allPassProvider>().Email[index], context.read<allPassProvider>().Password[index], context.read<allPassProvider>().KeyList[index]);
                                                 context.read<allPassProvider>().addSocial(index);
                                                 Fluttertoast.showToast(msg: "Account added!");
                                               } else{

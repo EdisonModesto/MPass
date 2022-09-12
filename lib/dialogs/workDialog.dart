@@ -155,7 +155,7 @@ class _workDialogState extends State<workDialog> {
                                               trailing: IconButton(
                                                 onPressed: () {
                                                   if(context.read<allPassProvider>().isWork[index] == "0") {
-                                                    context.read<workProvider>().addWork(context.read<allPassProvider>().Title[index], context.read<allPassProvider>().Email[index], context.read<allPassProvider>().Password[index], index.toString());
+                                                    context.read<workProvider>().addWork(context.read<allPassProvider>().Title[index], context.read<allPassProvider>().Email[index], context.read<allPassProvider>().Password[index], context.read<allPassProvider>().KeyList[index]);
                                                     context.read<allPassProvider>().addWork(index);
                                                     Fluttertoast.showToast(msg: "Account added!");
                                                   }else{

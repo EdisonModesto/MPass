@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../colors/AppColors.dart';
+import '../providers/allPassProvider.dart';
 import '../providers/colors.dart';
 
 
@@ -176,11 +177,169 @@ class _generate extends State<Generate>{
                                     trailing: IconButton(
                                       padding: const EdgeInsets.only(top: 10,bottom: 10),
                                         onPressed: (){
-                                          Clipboard.setData(ClipboardData(
-                                              text: _Password[index]));
+                                          Clipboard.setData(ClipboardData(text: _Password[index]));
 
                                           Fluttertoast.showToast(msg: "Password Copied!");
-                                          },
+                                          showDialog(context: context, builder: (BuildContext context){
+                                            return Center(
+                                              child: Card(
+                                                shape: const RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                ),
+                                                child: Container(
+                                                  width: MediaQuery.of(context).size.width * 0.7,
+                                                  height: 180,
+                                                  padding: EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 10),
+                                                  decoration: const BoxDecoration(
+                                                    borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Container(
+                                                        width: MediaQuery.of(context).size.width,
+                                                        child: const Text(
+                                                          "Add Password",
+                                                          style: TextStyle(
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 15
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        child: const Text(
+                                                          "You just copied a password! Do you want to add it as an account?",
+                                                          style: TextStyle(
+                                                              fontSize: 12
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.end,
+                                                        children: [
+                                                          TextButton(
+                                                              onPressed: (){Navigator.pop(context);},
+                                                              child: const Text(
+                                                                "No",
+                                                                style: TextStyle(
+                                                                    fontSize: 14,
+                                                                  color: Colors.grey
+                                                                ),
+                                                              )
+                                                          ),
+                                                          TextButton(
+                                                              onPressed: () {
+                                                                String tempName = "";
+                                                                String tempMail = "";
+                                                                String tempPass = "";
+                                                                final TextEditingController _titleCon = TextEditingController();
+                                                                final TextEditingController _emailCon = TextEditingController();
+                                                                final TextEditingController _passCon = TextEditingController();
+                                                                _passCon.text = _Password[index];
+                                                                showDialog(context: context, builder: (_)  =>
+
+                                                                    Center(
+                                                                      child: Card(
+                                                                        shape: const RoundedRectangleBorder(
+                                                                            borderRadius: BorderRadius.all(Radius.circular(15))
+                                                                        ),
+                                                                        child: Container(
+                                                                          width: MediaQuery.of(context).size.width * 0.8,
+                                                                          height: 275,
+                                                                          padding: const EdgeInsets.only(top: 20, bottom: 20, left: 30, right: 30),
+                                                                          decoration: const BoxDecoration(
+                                                                              borderRadius: BorderRadius.all(Radius.circular(15))
+                                                                          ),
+                                                                          child: Column(
+                                                                            children: [
+                                                                              const Text("Add Account", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),),
+                                                                              Expanded(
+                                                                                  flex: 1,
+                                                                                  child: Column(
+                                                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                                    children: [
+
+                                                                                      TextField(
+                                                                                        decoration: const InputDecoration(hintText: "App Name"),
+                                                                                        style: const TextStyle(fontSize: 14),
+                                                                                        onChanged: (val) {
+                                                                                          setState((){
+                                                                                            tempName = _titleCon.text;
+                                                                                          });
+                                                                                        },
+                                                                                        controller: _titleCon,
+                                                                                      ),
+                                                                                      TextField(
+                                                                                        decoration: const InputDecoration(hintText: "Email"),
+                                                                                        onChanged: (val2){
+                                                                                          setState((){
+                                                                                            tempMail = _emailCon.text;
+                                                                                          });
+                                                                                        },
+                                                                                        style: const TextStyle(fontSize: 14),
+                                                                                        controller: _emailCon,
+                                                                                        autofillHints: const [AutofillHints.email],
+                                                                                      ),
+                                                                                      TextField(
+                                                                                        decoration: const InputDecoration(hintText: "Password"),
+
+                                                                                        onChanged: (val3){
+                                                                                          setState((){
+                                                                                            tempPass = _passCon.text;
+                                                                                          });
+                                                                                        },
+                                                                                        style: const TextStyle(fontSize: 14),
+                                                                                        controller: _passCon,
+                                                                                        autofillHints: const [AutofillHints.password],
+                                                                                        onEditingComplete: () => TextInput.finishAutofillContext(),
+                                                                                      ),
+                                                                                    ],
+                                                                                  )
+                                                                              ),
+                                                                              Row(
+                                                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                                                children: [
+                                                                                  TextButton(
+                                                                                    onPressed: (){
+                                                                                      Navigator.pop(context, true);
+                                                                                    },
+                                                                                    child: const Text("Close"),
+                                                                                  ),
+                                                                                  TextButton(
+                                                                                      onPressed: (){
+                                                                                        context.read<allPassProvider>().addallPass(tempName, _emailCon.text, _passCon.text);
+                                                                                        Navigator.pop(context, true);
+                                                                                      },
+
+                                                                                      child: const Text("Add")
+                                                                                  ),
+                                                                                ],
+                                                                              )
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+
+                                                                );
+                                                              },
+                                                              child: const Text(
+                                                                "Yes",
+                                                                style: TextStyle(
+                                                                  fontSize: 14
+                                                                ),
+                                                              )
+                                                          ),
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          });
+                                       },
                                         icon: Image.asset("assets/images/copyicon.png")
                                     ),
                                     title: Column(
@@ -317,8 +476,6 @@ class _generate extends State<Generate>{
                               width: MediaQuery.of(context).size.width * 0.40,
                               child: Center(
                                 child: TextButton(
-
-
                                   onPressed: () {
                                     Fluttertoast.showToast(msg: "Coming Soon!");
                                   },

@@ -693,9 +693,9 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
                             width: MediaQuery.of(context).size.width * 1,
                             child: ElevatedButton(
                               onPressed: () {
-                                String tempName = "a";
-                                String tempMail = "a";
-                                String tempPass = "a";
+                                String tempName = "";
+                                String tempMail = "";
+                                String tempPass = "";
                                 final TextEditingController _titleCon = TextEditingController();
                                 final TextEditingController _emailCon = TextEditingController();
                                 final TextEditingController _passCon = TextEditingController();

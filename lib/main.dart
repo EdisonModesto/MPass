@@ -120,7 +120,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     _controller.addStatusListener((status) {
       if(status == AnimationStatus.completed){
         _controller.reset();
+        Navigator.pop(context);
         Navigator.push(context, MaterialPageRoute(builder: (context) => const pageViewScreen()),);
+
       }
     });
     super.initState();

@@ -6,7 +6,9 @@ import 'package:mpass/dialogs/viewSocialDialog.dart';
 import 'package:mpass/providers/socialProvider.dart';
 import 'package:provider/provider.dart';
 
+import '../colors/AppColors.dart';
 import '../dialogs/viewPassDialog.dart';
+import '../providers/colors.dart';
 
 class socialListView extends StatefulWidget {
   const socialListView({Key? key, required this.index}) : super(key: key);
@@ -16,6 +18,11 @@ class socialListView extends StatefulWidget {
 }
 
 class _socialListViewState extends State<socialListView> {
+
+  //Color Object instance
+  AppColors ColorObject = AppColors();
+  int currColor = 0;
+
 
   @override
   void initState() {
@@ -32,8 +39,22 @@ class _socialListViewState extends State<socialListView> {
         },
         contentPadding: const EdgeInsets.all(0),
         leading: Container(
-          padding: const EdgeInsets.only(top: 5, bottom: 5),
-          child: Image.asset("assets/images/fbIcon.png"),
+          width: 45,
+          height: 45,
+          //padding: const EdgeInsets.only(top:3, bottom: 0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            color: ColorObject.accent[context.watch<colorProvider>().colIndex],
+          ),
+          child: const Center(
+              child: Text(
+                "*",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 40
+                ),
+              )
+          ),
         ),
 
         trailing: IconButton(

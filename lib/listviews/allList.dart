@@ -2,8 +2,10 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mpass/providers/colors.dart';
 import 'package:provider/provider.dart';
 
+import '../colors/AppColors.dart';
 import '../dialogs/viewPassDialog.dart';
 import '../providers/allPassProvider.dart';
 
@@ -15,6 +17,11 @@ class allList extends StatefulWidget {
 }
 
 class _allListState extends State<allList> {
+
+  //Color Object instance
+  AppColors ColorObject = AppColors();
+  int currColor = 0;
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -25,8 +32,22 @@ class _allListState extends State<allList> {
         },
         contentPadding: const EdgeInsets.all(0),
         leading: Container(
-          padding: const EdgeInsets.only(top: 5, bottom: 5),
-          child: Image.asset("assets/images/fbIcon.png"),
+          width: 45,
+          height: 45,
+          //padding: const EdgeInsets.only(top:3, bottom: 0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            color: ColorObject.accent[context.watch<colorProvider>().colIndex],
+          ),
+          child: const Center(
+              child: Text(
+                  "*",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 40
+                ),
+              )
+          ),
         ),
 
         trailing: IconButton(

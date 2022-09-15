@@ -7,7 +7,9 @@ import 'package:mpass/dialogs/viewWorkDialog.dart';
 import 'package:mpass/providers/WorkProvider.dart';
 import 'package:provider/provider.dart';
 
+import '../colors/AppColors.dart';
 import '../dialogs/viewSocialDialog.dart';
+import '../providers/colors.dart';
 
 class workListView extends StatefulWidget {
   const workListView({Key? key, required this.index}) : super(key: key);
@@ -17,6 +19,12 @@ class workListView extends StatefulWidget {
 }
 
 class _workListViewState extends State<workListView> {
+
+  //Color Object instance
+  AppColors ColorObject = AppColors();
+  int currColor = 0;
+
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -27,8 +35,22 @@ class _workListViewState extends State<workListView> {
         },
         contentPadding: const EdgeInsets.all(0),
         leading: Container(
-          padding: const EdgeInsets.only(top: 5, bottom: 5),
-          child: Image.asset("assets/images/fbIcon.png"),
+          width: 45,
+          height: 45,
+          //padding: const EdgeInsets.only(top:3, bottom: 0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            color: ColorObject.accent[context.watch<colorProvider>().colIndex],
+          ),
+          child: const Center(
+              child: Text(
+                "*",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 40
+                ),
+              )
+          ),
         ),
 
         trailing: IconButton(

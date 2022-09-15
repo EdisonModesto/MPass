@@ -5,7 +5,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mpass/providers/searchProvider.dart';
 import 'package:provider/provider.dart';
 
+import '../colors/AppColors.dart';
 import '../dialogs/viewPassDialog.dart';
+import '../providers/colors.dart';
 
 class searchListView extends StatefulWidget {
   const searchListView({Key? key, required this.index}) : super(key: key);
@@ -15,6 +17,13 @@ class searchListView extends StatefulWidget {
 }
 
 class _searchListViewState extends State<searchListView> {
+
+
+  //Color Object instance
+  AppColors ColorObject = AppColors();
+  int currColor = 0;
+
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -25,8 +34,22 @@ class _searchListViewState extends State<searchListView> {
         },
         contentPadding: const EdgeInsets.all(0),
         leading: Container(
-          padding: const EdgeInsets.only(top: 5, bottom: 5),
-          child: Image.asset("assets/images/fbIcon.png"),
+          width: 45,
+          height: 45,
+          //padding: const EdgeInsets.only(top:3, bottom: 0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            color: ColorObject.accent[context.watch<colorProvider>().colIndex],
+          ),
+          child: const Center(
+              child: Text(
+                "*",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 40
+                ),
+              )
+          ),
         ),
 
         trailing: IconButton(

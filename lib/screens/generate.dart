@@ -187,8 +187,8 @@ class _generate extends State<Generate>{
                                                   borderRadius: BorderRadius.all(Radius.circular(15)),
                                                 ),
                                                 child: Container(
-                                                  width: MediaQuery.of(context).size.width * 0.7,
-                                                  height: 180,
+                                                  width: MediaQuery.of(context).size.width * 0.8,
+                                                  height: 200,
                                                   padding: EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 10),
                                                   decoration: const BoxDecoration(
                                                     borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -202,7 +202,7 @@ class _generate extends State<Generate>{
                                                           "Add Password",
                                                           style: TextStyle(
                                                             fontWeight: FontWeight.bold,
-                                                            fontSize: 15
+                                                            fontSize: 16
                                                           ),
                                                         ),
                                                       ),
@@ -210,7 +210,7 @@ class _generate extends State<Generate>{
                                                         child: const Text(
                                                           "You just copied a password! Do you want to add it as an account?",
                                                           style: TextStyle(
-                                                              fontSize: 12
+                                                              fontSize: 14
                                                           ),
                                                         ),
                                                       ),

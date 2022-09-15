@@ -27,7 +27,7 @@ class _settings extends State<Settings>{
   int currColor = 0;
 
 
-  List<String> settingsLbl = [ "Appearance", "Categories", "Scan Settings", "Backup Settings","Privacy and Policy"];
+  List<String> settingsLbl = [ "Appearance", "Categories", "Scan Settings", "Backup Settings","Privacy and Policy", "Bug Report"];
   
   bool scanMode = false;
   
@@ -239,6 +239,94 @@ class _settings extends State<Settings>{
                                       children: [
                                         Text(
                                           settingsLbl[4],
+                                          style: const TextStyle(
+                                            color: Color(0xff000000),
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        const Text(
+                                          ">",
+                                          style: TextStyle(
+                                            color: Color(0xffB3B3B3),
+                                            fontSize: 25,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                              ),
+                              //BUG REPORT
+                              SizedBox(
+                                  width: MediaQuery.of(context).size.width * 1,
+                                  height: 50,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      showDialog(context: context, builder: (BuildContext context){
+                                        double diaHeight = 300;
+                                        bool lottieVis = true;
+                                        return StatefulBuilder(
+                                            builder: (context, setState) {
+                                              return Center(
+                                                child: Card(
+                                                  shape: const RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius
+                                                          .all(Radius.circular(15))
+                                                  ),
+                                                  child: AnimatedContainer(
+                                                    height: diaHeight,
+                                                    width: MediaQuery.of(context).size.width * 0.8,
+                                                    duration: Duration(milliseconds: 100),
+                                                    child: ClipRRect(
+                                                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                                                        child: Stack(
+                                                          children: [
+                                                            Visibility(
+                                                              visible: true,
+                                                              child: WebView(
+                                                                initialUrl: "https://docs.google.com/forms/d/e/1FAIpQLSexjW20a553nzHxMI_fMBg_drsaNw2It9s8TlGxA3iuIzar1g/viewform?usp=sf_link",
+                                                                javascriptMode: JavascriptMode.unrestricted,
+
+                                                                onProgress: (value){
+                                                                  if(value == 70){
+                                                                    print("expanding");
+                                                                    setState((){
+                                                                      lottieVis = false;
+                                                                      diaHeight = 600;
+                                                                    });
+                                                                  }
+                                                                },
+
+                                                                onPageFinished: (finish){
+                                                                  print("loaded");
+                                                                  setState((){
+                                                                    lottieVis = false;
+                                                                    diaHeight = 600;
+                                                                  });
+                                                                },
+                                                              ),
+                                                            ),
+                                                            Center(
+                                                              child: Visibility(
+                                                                visible: lottieVis,
+                                                                child: LottieBuilder.asset(
+                                                                    "assets/lottie/loader.json"
+                                                                ),
+                                                              ),
+                                                            )
+                                                          ],
+                                                        )
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            });
+                                      });
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          settingsLbl[5],
                                           style: const TextStyle(
                                             color: Color(0xff000000),
                                             fontSize: 16,

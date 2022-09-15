@@ -460,7 +460,6 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
       });
     }
 
-
   @override
   void initState() {
     _checkBreached();
@@ -472,6 +471,7 @@ class _homePage extends State<Home> with TickerProviderStateMixin{
         _lottieController.reset();
       }
     });
+
     super.initState();
   }
 

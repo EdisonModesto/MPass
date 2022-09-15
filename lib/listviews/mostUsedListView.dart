@@ -4,8 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
+import '../colors/AppColors.dart';
 import '../dialogs/viewPassDialog.dart';
 import '../providers/allPassProvider.dart';
+import '../providers/colors.dart';
 
 class mostUsedListView extends StatefulWidget {
   const mostUsedListView({Key? key, required this.index}) : super(key: key);
@@ -16,11 +18,18 @@ class mostUsedListView extends StatefulWidget {
 
 class _mostUsedListViewState extends State<mostUsedListView> {
 
+
+  //Color Object instance
+  AppColors ColorObject = AppColors();
+  int currColor = 0;
+
+
   @override
   void initState() {
 
     super.initState();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +41,22 @@ class _mostUsedListViewState extends State<mostUsedListView> {
         },
         contentPadding: const EdgeInsets.all(0),
         leading: Container(
-          padding: const EdgeInsets.only(top: 5, bottom: 5),
-          child: Image.asset("assets/images/fbIcon.png"),
+          width: 45,
+          height: 45,
+          //padding: const EdgeInsets.only(top:3, bottom: 0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            color: ColorObject.accent[context.watch<colorProvider>().colIndex],
+          ),
+          child: const Center(
+              child: Text(
+                "*",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 40
+                ),
+              )
+          ),
         ),
 
         trailing: IconButton(
